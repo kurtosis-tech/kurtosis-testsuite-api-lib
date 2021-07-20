@@ -1,4 +1,6 @@
 # TBD
+### Fixes
+* Remove the docs for the now-nonexistent `Test.getSetupTimeout` and `Test.getRunTimeout` methods
 
 # 0.1.2
 ### Changes

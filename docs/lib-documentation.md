@@ -65,20 +65,6 @@ Executes test logic after [Test.setup][test_setup] has completed. For languages 
 
 * `network`: A [Network][network] implementation representing the test network that the test is executing against.
 
-### getSetupTimeout() -\> Duration
-Declares the timeframe in which [Test.setup][test_setup] must complete, to prevent infinite loop bugs from hanging Kurtosis indefinitely.
-
-**Returns**
-
-The time in which test setup must complete.
-
-### getExecutionTimeout() -\> Duration
-Declares the timeframe in which [Test.run][test_run] must complete, to prevent infinite loop bugs from hanging Kurtosis indefinitely.
-
-**Returns**
-
-The time in which test execution must complete.
-
 TestConfiguration
 -----------------
 Object that contains various configuration parameters controlling how a test behaves, which will be configured by the [TestConfigurationBuilder][testconfigurationbuilder] in the [Test.configure][test_configure] method.
