@@ -2,8 +2,8 @@ package execution
 
 import (
 	"github.com/kurtosis-tech/kurtosis-client/golang/kurtosis_core_rpc_api_bindings"
-	"github.com/kurtosis-tech/kurtosis-libs/golang/lib/rpc_api/bindings"
-	"github.com/kurtosis-tech/kurtosis-libs/golang/lib/rpc_api/rpc_api_consts"
+	"github.com/kurtosis-tech/kurtosis-testsuite-api-lib/golang/kurtosis_testsuite_rpc_api_bindings"
+	"github.com/kurtosis-tech/kurtosis-testsuite-api-lib/golang/kurtosis_testsuite_rpc_api_consts"
 	"github.com/kurtosis-tech/minimal-grpc-server/server"
 	"github.com/palantir/stacktrace"
 	"google.golang.org/grpc"
@@ -53,12 +53,12 @@ func (executor TestSuiteExecutor) Run() error {
 
 	testsuiteService := NewTestSuiteService(suite, apiContainerService)
 	testsuiteServiceRegistrationFunc := func(grpcServer *grpc.Server) {
-		bindings.RegisterTestSuiteServiceServer(grpcServer, testsuiteService)
+		kurtosis_testsuite_rpc_api_bindings.RegisterTestSuiteServiceServer(grpcServer, testsuiteService)
 	}
 
 	testsuiteServer := server.NewMinimalGRPCServer(
-		rpc_api_consts.ListenPort,
-		rpc_api_consts.ListenProtocol,
+		kurtosis_testsuite_rpc_api_consts.ListenPort,
+		kurtosis_testsuite_rpc_api_consts.ListenProtocol,
 		grpcServerStopGracePeriod,
 		[]func(desc *grpc.Server) {
 			testsuiteServiceRegistrationFunc,

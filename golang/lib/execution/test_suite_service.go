@@ -5,9 +5,9 @@ import (
 	"github.com/kurtosis-tech/kurtosis-client/golang/kurtosis_core_rpc_api_bindings"
 	"github.com/kurtosis-tech/kurtosis-client/golang/lib/networks"
 	"github.com/kurtosis-tech/kurtosis-client/golang/lib/services"
-	"github.com/kurtosis-tech/kurtosis-libs/golang/lib/docker_api/test_suite_container_mountpoints"
-	"github.com/kurtosis-tech/kurtosis-libs/golang/lib/rpc_api/bindings"
-	"github.com/kurtosis-tech/kurtosis-libs/golang/lib/testsuite"
+	"github.com/kurtosis-tech/kurtosis-testsuite-api-lib/golang/kurtosis_testsuite_docker_api"
+	"github.com/kurtosis-tech/kurtosis-testsuite-api-lib/golang/kurtosis_testsuite_rpc_api_bindings"
+	"github.com/kurtosis-tech/kurtosis-testsuite-api-lib/golang/lib/testsuite"
 	"github.com/palantir/stacktrace"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -24,7 +24,7 @@ type testSetupInfo struct {
 
 type TestSuiteService struct {
 	// This embedding is required by gRPC
-	bindings.UnimplementedTestSuiteServiceServer
+	kurtosis_testsuite_rpc_api_bindings.UnimplementedTestSuiteServiceServer
 
 	suite testsuite.TestSuite
 
@@ -51,8 +51,8 @@ func (service TestSuiteService) IsAvailable(_ context.Context, _ *emptypb.Empty)
 	return &emptypb.Empty{}, nil
 }
 
-func (service TestSuiteService) GetTestSuiteMetadata(ctx context.Context, empty *emptypb.Empty) (*bindings.TestSuiteMetadata, error) {
-	allTestMetadata := map[string]*bindings.TestMetadata{}
+func (service TestSuiteService) GetTestSuiteMetadata(ctx context.Context, empty *emptypb.Empty) (*kurtosis_testsuite_rpc_api_bindings.TestSuiteMetadata, error) {
+	allTestMetadata := map[string]*kurtosis_testsuite_rpc_api_bindings.TestMetadata{}
 	for testName, test := range service.suite.GetTests() {
 		testConfigBuilder := testsuite.NewTestConfigurationBuilder()
 		test.Configure(testConfigBuilder)
@@ -61,7 +61,7 @@ func (service TestSuiteService) GetTestSuiteMetadata(ctx context.Context, empty 
 		for _, artifactUrl := range testConfig.FilesArtifactUrls {
 			usedArtifactUrls[artifactUrl] = true
 		}
-		testMetadata := &bindings.TestMetadata{
+		testMetadata := &kurtosis_testsuite_rpc_api_bindings.TestMetadata{
 			IsPartitioningEnabled: testConfig.IsPartitioningEnabled,
 			UsedArtifactUrls:      usedArtifactUrls,
 			TestSetupTimeoutInSeconds: testConfig.SetupTimeoutSeconds,
@@ -76,7 +76,7 @@ func (service TestSuiteService) GetTestSuiteMetadata(ctx context.Context, empty 
 	for key := range staticFiles {
 		staticFilesStrKeys[string(key)] = true
 	}
-	testSuiteMetadata := &bindings.TestSuiteMetadata{
+	testSuiteMetadata := &kurtosis_testsuite_rpc_api_bindings.TestSuiteMetadata{
 		TestMetadata:     allTestMetadata,
 		NetworkWidthBits: networkWidthBits,
 		StaticFiles: staticFilesStrKeys,
@@ -85,7 +85,7 @@ func (service TestSuiteService) GetTestSuiteMetadata(ctx context.Context, empty 
 	return testSuiteMetadata, nil
 }
 
-func (service *TestSuiteService) CopyStaticFilesToExecutionVolume(ctx context.Context, args *bindings.CopyStaticFilesToExecutionVolumeArgs) (*emptypb.Empty, error) {
+func (service *TestSuiteService) CopyStaticFilesToExecutionVolume(ctx context.Context, args *kurtosis_testsuite_rpc_api_bindings.CopyStaticFilesToExecutionVolumeArgs) (*emptypb.Empty, error) {
 	staticFileDestRelativeFilepaths := args.StaticFileDestRelativeFilepaths
 
 	allStaticFiles := service.suite.GetStaticFiles()
@@ -105,7 +105,7 @@ func (service *TestSuiteService) CopyStaticFilesToExecutionVolume(ctx context.Co
 		staticFileSrcAbsFilepaths[staticFileId] = srcAbsFilepath
 
 		// Sanity-check that a file has been created at the destination by Kurtosis
-		destAbsFilepath := path.Join(test_suite_container_mountpoints.TestsuiteContainerSuiteExVolMountpoint, destRelativeFilepath)
+		destAbsFilepath := path.Join(kurtosis_testsuite_docker_api.TestsuiteContainerSuiteExVolMountpoint, destRelativeFilepath)
 		if _, err := os.Stat(destAbsFilepath); os.IsNotExist(err) {
 			return nil, stacktrace.NewError("The Kurtosis API asked us to copy static file '%v' to path '%v' in the suite execution volume, but no file exists there - this is a bug in Kurtosis!", staticFileId, destRelativeFilepath)
 		}
@@ -144,7 +144,7 @@ func (service *TestSuiteService) CopyStaticFilesToExecutionVolume(ctx context.Co
 	return &emptypb.Empty{}, nil
 }
 
-func (service *TestSuiteService) SetupTest(ctx context.Context, args *bindings.SetupTestArgs) (*emptypb.Empty, error) {
+func (service *TestSuiteService) SetupTest(ctx context.Context, args *kurtosis_testsuite_rpc_api_bindings.SetupTestArgs) (*emptypb.Empty, error) {
 	service.testSetupInfoMutex.Lock()
 	defer service.testSetupInfoMutex.Unlock()
 
@@ -173,7 +173,7 @@ func (service *TestSuiteService) SetupTest(ctx context.Context, args *bindings.S
 	networkCtx := networks.NewNetworkContext(
 		service.kurtosisApiClient,
 		filesArtifactUrls,
-		test_suite_container_mountpoints.TestsuiteContainerSuiteExVolMountpoint,
+		kurtosis_testsuite_docker_api.TestsuiteContainerSuiteExVolMountpoint,
 	)
 
 	userNetwork, err := test.Setup(networkCtx)

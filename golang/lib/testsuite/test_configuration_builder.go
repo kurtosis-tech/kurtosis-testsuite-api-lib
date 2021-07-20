@@ -10,7 +10,7 @@ const (
 	// ^^^^^^^^^ Update the docs if you change these ^^^^^^^^^^^
 )
 
-// Docs available at https://docs.kurtosistech.com/kurtosis-libs/lib-documentation
+// Docs available at https://docs.kurtosistech.com/kurtosis-testsuite-api-lib/lib-documentation
 type TestConfigurationBuilder struct {
 	setupTimeoutSeconds uint32
 	runTimeoutSeconds uint32
