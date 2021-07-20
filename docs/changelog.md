@@ -1,6 +1,13 @@
 # TBD
+### Features
+* The `TestsuiteExecutor` no longer requires a constructor with Kurtosis API socket, loglevel, and testsuite params args, and instead reads them directly from the environment
+
 ### Fixes
 * Remove the docs for the now-nonexistent `Test.getSetupTimeout` and `Test.getRunTimeout` methods
+
+### Breaking Changes
+* `NewTestsuiteExecutor` no longer reads Kurtosis API socket, loglevel, or serialized testsuite params
+    * This means that users can change their Dockerfile `CMD` to simply call their program, with no need to read any environment variables - e.g. `CMD ./testsuite.bin --api-socket ${API_SOCKET} --log-level ${LOG_LEVEL} --custom-params ${CUSTOM_PARAMS}` becomes `CMD ./testsuite.bin`
 
 # 0.1.2
 ### Changes
