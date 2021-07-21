@@ -13,6 +13,7 @@
 * The `TestSuiteMetadata` object no longer contains static files
 * The `TestMetadata` object no longer contains files artifact URLs
 * The `CopyStaticFilesToExecutionVolume` testsuite service endpoint has been removed; the `RegisterFiles` endpoint should be used instead
+* Renamed `TestsuiteContainerSuiteExVolMountpoint` -> `EnclaveDataVolumeMountpoint`
 
 # 0.1.2
 ### Changes

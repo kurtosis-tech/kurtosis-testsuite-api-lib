@@ -55,7 +55,7 @@ func (executor TestSuiteExecutor) Run() error {
 		apiContainerClient := kurtosis_core_rpc_api_bindings.NewApiContainerServiceClient(conn)
 		networkCtx := networks.NewNetworkContext(
 			apiContainerClient,
-			kurtosis_testsuite_docker_api.TestsuiteContainerSuiteExVolMountpoint,
+			kurtosis_testsuite_docker_api.EnclaveDataVolumeMountpoint,
 		)
 		testsuiteService = NewTestExecutingTestsuiteService(suite, networkCtx)
 	}

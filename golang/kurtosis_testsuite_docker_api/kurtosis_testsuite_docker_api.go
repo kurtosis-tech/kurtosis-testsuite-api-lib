@@ -8,8 +8,8 @@ const (
 
 
 	/*
-	The dirpath on the testsuite container where the execution volume will be mounted
+	The dirpath on the testsuite container where the enclave data volume will be mounted
 	This is hardcoded because there's no real reason for it to be parameterized.
 	*/
-	TestsuiteContainerSuiteExVolMountpoint = "/suite-execution"
+	EnclaveDataVolumeMountpoint = "/kurtosis-enclave-data"
 )
