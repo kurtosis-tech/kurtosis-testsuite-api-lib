@@ -1,4 +1,6 @@
 # TBD
+
+# 0.2.0
 ### Features
 * The `TestsuiteExecutor` no longer requires a constructor with Kurtosis API socket, loglevel, and testsuite params args, and instead reads them directly from the environment
 
