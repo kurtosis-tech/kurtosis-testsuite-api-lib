@@ -10,9 +10,9 @@ import * as grpc from "grpc";
 interface ITestSuiteServiceService extends grpc.ServiceDefinition<grpc.UntypedServiceImplementation> {
   isAvailable: grpc.MethodDefinition<google_protobuf_empty_pb.Empty, google_protobuf_empty_pb.Empty>;
   getTestSuiteMetadata: grpc.MethodDefinition<google_protobuf_empty_pb.Empty, testsuite_service_pb.TestSuiteMetadata>;
-  copyStaticFilesToExecutionVolume: grpc.MethodDefinition<testsuite_service_pb.CopyStaticFilesToExecutionVolumeArgs, google_protobuf_empty_pb.Empty>;
+  registerFiles: grpc.MethodDefinition<testsuite_service_pb.RegisterFilesArgs, google_protobuf_empty_pb.Empty>;
   setupTest: grpc.MethodDefinition<testsuite_service_pb.SetupTestArgs, google_protobuf_empty_pb.Empty>;
-  runTest: grpc.MethodDefinition<google_protobuf_empty_pb.Empty, google_protobuf_empty_pb.Empty>;
+  runTest: grpc.MethodDefinition<testsuite_service_pb.RunTestArgs, google_protobuf_empty_pb.Empty>;
 }
 
 export const TestSuiteServiceService: ITestSuiteServiceService;
@@ -20,9 +20,9 @@ export const TestSuiteServiceService: ITestSuiteServiceService;
 export interface ITestSuiteServiceServer extends grpc.UntypedServiceImplementation {
   isAvailable: grpc.handleUnaryCall<google_protobuf_empty_pb.Empty, google_protobuf_empty_pb.Empty>;
   getTestSuiteMetadata: grpc.handleUnaryCall<google_protobuf_empty_pb.Empty, testsuite_service_pb.TestSuiteMetadata>;
-  copyStaticFilesToExecutionVolume: grpc.handleUnaryCall<testsuite_service_pb.CopyStaticFilesToExecutionVolumeArgs, google_protobuf_empty_pb.Empty>;
+  registerFiles: grpc.handleUnaryCall<testsuite_service_pb.RegisterFilesArgs, google_protobuf_empty_pb.Empty>;
   setupTest: grpc.handleUnaryCall<testsuite_service_pb.SetupTestArgs, google_protobuf_empty_pb.Empty>;
-  runTest: grpc.handleUnaryCall<google_protobuf_empty_pb.Empty, google_protobuf_empty_pb.Empty>;
+  runTest: grpc.handleUnaryCall<testsuite_service_pb.RunTestArgs, google_protobuf_empty_pb.Empty>;
 }
 
 export class TestSuiteServiceClient extends grpc.Client {
@@ -33,13 +33,13 @@ export class TestSuiteServiceClient extends grpc.Client {
   getTestSuiteMetadata(argument: google_protobuf_empty_pb.Empty, callback: grpc.requestCallback<testsuite_service_pb.TestSuiteMetadata>): grpc.ClientUnaryCall;
   getTestSuiteMetadata(argument: google_protobuf_empty_pb.Empty, metadataOrOptions: grpc.Metadata | grpc.CallOptions | null, callback: grpc.requestCallback<testsuite_service_pb.TestSuiteMetadata>): grpc.ClientUnaryCall;
   getTestSuiteMetadata(argument: google_protobuf_empty_pb.Empty, metadata: grpc.Metadata | null, options: grpc.CallOptions | null, callback: grpc.requestCallback<testsuite_service_pb.TestSuiteMetadata>): grpc.ClientUnaryCall;
-  copyStaticFilesToExecutionVolume(argument: testsuite_service_pb.CopyStaticFilesToExecutionVolumeArgs, callback: grpc.requestCallback<google_protobuf_empty_pb.Empty>): grpc.ClientUnaryCall;
-  copyStaticFilesToExecutionVolume(argument: testsuite_service_pb.CopyStaticFilesToExecutionVolumeArgs, metadataOrOptions: grpc.Metadata | grpc.CallOptions | null, callback: grpc.requestCallback<google_protobuf_empty_pb.Empty>): grpc.ClientUnaryCall;
-  copyStaticFilesToExecutionVolume(argument: testsuite_service_pb.CopyStaticFilesToExecutionVolumeArgs, metadata: grpc.Metadata | null, options: grpc.CallOptions | null, callback: grpc.requestCallback<google_protobuf_empty_pb.Empty>): grpc.ClientUnaryCall;
+  registerFiles(argument: testsuite_service_pb.RegisterFilesArgs, callback: grpc.requestCallback<google_protobuf_empty_pb.Empty>): grpc.ClientUnaryCall;
+  registerFiles(argument: testsuite_service_pb.RegisterFilesArgs, metadataOrOptions: grpc.Metadata | grpc.CallOptions | null, callback: grpc.requestCallback<google_protobuf_empty_pb.Empty>): grpc.ClientUnaryCall;
+  registerFiles(argument: testsuite_service_pb.RegisterFilesArgs, metadata: grpc.Metadata | null, options: grpc.CallOptions | null, callback: grpc.requestCallback<google_protobuf_empty_pb.Empty>): grpc.ClientUnaryCall;
   setupTest(argument: testsuite_service_pb.SetupTestArgs, callback: grpc.requestCallback<google_protobuf_empty_pb.Empty>): grpc.ClientUnaryCall;
   setupTest(argument: testsuite_service_pb.SetupTestArgs, metadataOrOptions: grpc.Metadata | grpc.CallOptions | null, callback: grpc.requestCallback<google_protobuf_empty_pb.Empty>): grpc.ClientUnaryCall;
   setupTest(argument: testsuite_service_pb.SetupTestArgs, metadata: grpc.Metadata | null, options: grpc.CallOptions | null, callback: grpc.requestCallback<google_protobuf_empty_pb.Empty>): grpc.ClientUnaryCall;
-  runTest(argument: google_protobuf_empty_pb.Empty, callback: grpc.requestCallback<google_protobuf_empty_pb.Empty>): grpc.ClientUnaryCall;
-  runTest(argument: google_protobuf_empty_pb.Empty, metadataOrOptions: grpc.Metadata | grpc.CallOptions | null, callback: grpc.requestCallback<google_protobuf_empty_pb.Empty>): grpc.ClientUnaryCall;
-  runTest(argument: google_protobuf_empty_pb.Empty, metadata: grpc.Metadata | null, options: grpc.CallOptions | null, callback: grpc.requestCallback<google_protobuf_empty_pb.Empty>): grpc.ClientUnaryCall;
+  runTest(argument: testsuite_service_pb.RunTestArgs, callback: grpc.requestCallback<google_protobuf_empty_pb.Empty>): grpc.ClientUnaryCall;
+  runTest(argument: testsuite_service_pb.RunTestArgs, metadataOrOptions: grpc.Metadata | grpc.CallOptions | null, callback: grpc.requestCallback<google_protobuf_empty_pb.Empty>): grpc.ClientUnaryCall;
+  runTest(argument: testsuite_service_pb.RunTestArgs, metadata: grpc.Metadata | null, options: grpc.CallOptions | null, callback: grpc.requestCallback<google_protobuf_empty_pb.Empty>): grpc.ClientUnaryCall;
 }

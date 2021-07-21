@@ -16,15 +16,26 @@ function deserialize_google_protobuf_Empty(buffer_arg) {
   return google_protobuf_empty_pb.Empty.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
-function serialize_test_suite_api_CopyStaticFilesToExecutionVolumeArgs(arg) {
-  if (!(arg instanceof testsuite_service_pb.CopyStaticFilesToExecutionVolumeArgs)) {
-    throw new Error('Expected argument of type test_suite_api.CopyStaticFilesToExecutionVolumeArgs');
+function serialize_test_suite_api_RegisterFilesArgs(arg) {
+  if (!(arg instanceof testsuite_service_pb.RegisterFilesArgs)) {
+    throw new Error('Expected argument of type test_suite_api.RegisterFilesArgs');
   }
   return Buffer.from(arg.serializeBinary());
 }
 
-function deserialize_test_suite_api_CopyStaticFilesToExecutionVolumeArgs(buffer_arg) {
-  return testsuite_service_pb.CopyStaticFilesToExecutionVolumeArgs.deserializeBinary(new Uint8Array(buffer_arg));
+function deserialize_test_suite_api_RegisterFilesArgs(buffer_arg) {
+  return testsuite_service_pb.RegisterFilesArgs.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_test_suite_api_RunTestArgs(arg) {
+  if (!(arg instanceof testsuite_service_pb.RunTestArgs)) {
+    throw new Error('Expected argument of type test_suite_api.RunTestArgs');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_test_suite_api_RunTestArgs(buffer_arg) {
+  return testsuite_service_pb.RunTestArgs.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
 function serialize_test_suite_api_SetupTestArgs(arg) {
@@ -74,16 +85,16 @@ isAvailable: {
     responseSerialize: serialize_test_suite_api_TestSuiteMetadata,
     responseDeserialize: deserialize_test_suite_api_TestSuiteMetadata,
   },
-  // Will be called by Kurtosis itself, telling the testsuite container to copy static files contained in the testsuite 
-//  to the suite execution volume so that API containers can use them when starting services
-copyStaticFilesToExecutionVolume: {
-    path: '/test_suite_api.TestSuiteService/CopyStaticFilesToExecutionVolume',
+  // Will be called by the test initializer container, telling the testsuite container to register static files & files artifacts
+//  so that they're available in the API container before the tests start running
+registerFiles: {
+    path: '/test_suite_api.TestSuiteService/RegisterFiles',
     requestStream: false,
     responseStream: false,
-    requestType: testsuite_service_pb.CopyStaticFilesToExecutionVolumeArgs,
+    requestType: testsuite_service_pb.RegisterFilesArgs,
     responseType: google_protobuf_empty_pb.Empty,
-    requestSerialize: serialize_test_suite_api_CopyStaticFilesToExecutionVolumeArgs,
-    requestDeserialize: deserialize_test_suite_api_CopyStaticFilesToExecutionVolumeArgs,
+    requestSerialize: serialize_test_suite_api_RegisterFilesArgs,
+    requestDeserialize: deserialize_test_suite_api_RegisterFilesArgs,
     responseSerialize: serialize_google_protobuf_Empty,
     responseDeserialize: deserialize_google_protobuf_Empty,
   },
@@ -98,16 +109,14 @@ copyStaticFilesToExecutionVolume: {
     responseSerialize: serialize_google_protobuf_Empty,
     responseDeserialize: deserialize_google_protobuf_Empty,
   },
-  // We don't need args dictating what test to run because SetupTest already indicates it (and it wouldn't make
-//  sense to setup one test and run another)
-runTest: {
+  runTest: {
     path: '/test_suite_api.TestSuiteService/RunTest',
     requestStream: false,
     responseStream: false,
-    requestType: google_protobuf_empty_pb.Empty,
+    requestType: testsuite_service_pb.RunTestArgs,
     responseType: google_protobuf_empty_pb.Empty,
-    requestSerialize: serialize_google_protobuf_Empty,
-    requestDeserialize: deserialize_google_protobuf_Empty,
+    requestSerialize: serialize_test_suite_api_RunTestArgs,
+    requestDeserialize: deserialize_test_suite_api_RunTestArgs,
     responseSerialize: serialize_google_protobuf_Empty,
     responseDeserialize: deserialize_google_protobuf_Empty,
   },

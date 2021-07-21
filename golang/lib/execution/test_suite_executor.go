@@ -2,6 +2,8 @@ package execution
 
 import (
 	"github.com/kurtosis-tech/kurtosis-client/golang/kurtosis_core_rpc_api_bindings"
+	"github.com/kurtosis-tech/kurtosis-client/golang/lib/networks"
+	"github.com/kurtosis-tech/kurtosis-testsuite-api-lib/golang/kurtosis_testsuite_docker_api"
 	"github.com/kurtosis-tech/kurtosis-testsuite-api-lib/golang/kurtosis_testsuite_rpc_api_bindings"
 	"github.com/kurtosis-tech/kurtosis-testsuite-api-lib/golang/kurtosis_testsuite_rpc_api_consts"
 	"github.com/kurtosis-tech/minimal-grpc-server/server"
@@ -35,8 +37,10 @@ func (executor TestSuiteExecutor) Run() error {
 		return stacktrace.Propagate(err, "An error occurred parsing the suite params JSON and creating the testsuite")
 	}
 
-	var apiContainerService kurtosis_core_rpc_api_bindings.ApiContainerServiceClient = nil
-	if executor.kurtosisApiSocket != "" {
+	var testsuiteService kurtosis_testsuite_rpc_api_bindings.TestSuiteServiceServer
+	if executor.kurtosisApiSocket == "" {
+		testsuiteService = NewMetadataProvidingTestsuiteService(suite)
+	} else {
 		// TODO SECURITY: Use HTTPS to ensure we're connecting to the real Kurtosis API servers
 		conn, err := grpc.Dial(executor.kurtosisApiSocket, grpc.WithInsecure())
 		if err != nil {
@@ -48,10 +52,14 @@ func (executor TestSuiteExecutor) Run() error {
 		}
 		defer conn.Close()
 
-		apiContainerService = kurtosis_core_rpc_api_bindings.NewApiContainerServiceClient(conn)
+		apiContainerClient := kurtosis_core_rpc_api_bindings.NewApiContainerServiceClient(conn)
+		networkCtx := networks.NewNetworkContext(
+			apiContainerClient,
+			kurtosis_testsuite_docker_api.TestsuiteContainerSuiteExVolMountpoint,
+		)
+		testsuiteService = NewTestExecutingTestsuiteService(suite, networkCtx)
 	}
 
-	testsuiteService := NewTestSuiteService(suite, apiContainerService)
 	testsuiteServiceRegistrationFunc := func(grpcServer *grpc.Server) {
 		kurtosis_testsuite_rpc_api_bindings.RegisterTestSuiteServiceServer(grpcServer, testsuiteService)
 	}

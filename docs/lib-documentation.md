@@ -78,6 +78,8 @@ The amount of time a test has to finish the [Test.run][test_run] phase. If the p
 ### bool isPartitioningEnabled
 Setting this to true allows a test to make use of the [NetworkContext.repartitionNetwork][networkcontext_repartitionnetwork] method. This is a configuration flag (rather than enabled by default) because enabling repartitioning requires spinning up extra sidecar Docker containers, and thus an extra load on the system running Kurtosis.
 
+### TODO TODO staticFileFilepaths
+
 <!-- TODO change key type to FilesArtifactID -->
 ### Map\<String, String\> filesArtifactUrls
 Mapping of a user-defined key -> URL of a gzipped TAR whose contents the test will mount on a service. This should be left empty if no files artifacts are needed. For more details on what files artifacts are, see [ContainerCreationConfig.filesArtifactMountpoints][containercreationconfig_filesartifactmountpoints].
@@ -105,6 +107,7 @@ Map of test name -> test object.
 ### getNetworkWidthBits() -\> uint32
 Determines the width (in bits) of the Docker network that Kurtosis will create for each test. The maximum number of IP addresses that any test can use will be 2 ^ network_width_bits, which determines the maximum number of services that can be running at any given time in a testnet. This number should be set high enough that no test will run out of IP addresses, but low enough that the Docker environment doesn't run out of IP addresses (`8` is a good value to start with).
 
+TODO TODO KILL
 ### getStaticFiles() -\> Map\<String, String\>
 Defines the static files inside the testsuite container that are available for use when starting services. 
 
