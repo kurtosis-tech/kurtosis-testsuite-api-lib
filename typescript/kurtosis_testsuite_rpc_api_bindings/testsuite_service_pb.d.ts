@@ -10,8 +10,6 @@ export class TestSuiteMetadata extends jspb.Message {
   getNetworkWidthBits(): number;
   setNetworkWidthBits(value: number): void;
 
-  getStaticFilesMap(): jspb.Map<string, boolean>;
-  clearStaticFilesMap(): void;
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): TestSuiteMetadata.AsObject;
   static toObject(includeInstance: boolean, msg: TestSuiteMetadata): TestSuiteMetadata.AsObject;
@@ -26,7 +24,6 @@ export namespace TestSuiteMetadata {
   export type AsObject = {
     testMetadataMap: Array<[string, TestMetadata.AsObject]>,
     networkWidthBits: number,
-    staticFilesMap: Array<[string, boolean]>,
   }
 }
 
@@ -34,8 +31,6 @@ export class TestMetadata extends jspb.Message {
   getIsPartitioningEnabled(): boolean;
   setIsPartitioningEnabled(value: boolean): void;
 
-  getUsedArtifactUrlsMap(): jspb.Map<string, boolean>;
-  clearUsedArtifactUrlsMap(): void;
   getTestSetupTimeoutInSeconds(): number;
   setTestSetupTimeoutInSeconds(value: number): void;
 
@@ -55,28 +50,28 @@ export class TestMetadata extends jspb.Message {
 export namespace TestMetadata {
   export type AsObject = {
     isPartitioningEnabled: boolean,
-    usedArtifactUrlsMap: Array<[string, boolean]>,
     testSetupTimeoutInSeconds: number,
     testRunTimeoutInSeconds: number,
   }
 }
 
-export class CopyStaticFilesToExecutionVolumeArgs extends jspb.Message {
-  getStaticFileDestRelativeFilepathsMap(): jspb.Map<string, string>;
-  clearStaticFileDestRelativeFilepathsMap(): void;
+export class RegisterFilesArgs extends jspb.Message {
+  getTestName(): string;
+  setTestName(value: string): void;
+
   serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): CopyStaticFilesToExecutionVolumeArgs.AsObject;
-  static toObject(includeInstance: boolean, msg: CopyStaticFilesToExecutionVolumeArgs): CopyStaticFilesToExecutionVolumeArgs.AsObject;
+  toObject(includeInstance?: boolean): RegisterFilesArgs.AsObject;
+  static toObject(includeInstance: boolean, msg: RegisterFilesArgs): RegisterFilesArgs.AsObject;
   static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
   static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-  static serializeBinaryToWriter(message: CopyStaticFilesToExecutionVolumeArgs, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): CopyStaticFilesToExecutionVolumeArgs;
-  static deserializeBinaryFromReader(message: CopyStaticFilesToExecutionVolumeArgs, reader: jspb.BinaryReader): CopyStaticFilesToExecutionVolumeArgs;
+  static serializeBinaryToWriter(message: RegisterFilesArgs, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): RegisterFilesArgs;
+  static deserializeBinaryFromReader(message: RegisterFilesArgs, reader: jspb.BinaryReader): RegisterFilesArgs;
 }
 
-export namespace CopyStaticFilesToExecutionVolumeArgs {
+export namespace RegisterFilesArgs {
   export type AsObject = {
-    staticFileDestRelativeFilepathsMap: Array<[string, string]>,
+    testName: string,
   }
 }
 
@@ -95,6 +90,26 @@ export class SetupTestArgs extends jspb.Message {
 }
 
 export namespace SetupTestArgs {
+  export type AsObject = {
+    testName: string,
+  }
+}
+
+export class RunTestArgs extends jspb.Message {
+  getTestName(): string;
+  setTestName(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): RunTestArgs.AsObject;
+  static toObject(includeInstance: boolean, msg: RunTestArgs): RunTestArgs.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: RunTestArgs, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): RunTestArgs;
+  static deserializeBinaryFromReader(message: RunTestArgs, reader: jspb.BinaryReader): RunTestArgs;
+}
+
+export namespace RunTestArgs {
   export type AsObject = {
     testName: string,
   }
