@@ -47,14 +47,14 @@ func (service MetadataProvidingTestsuiteService) GetTestSuiteMetadata(ctx contex
 }
 
 func (service MetadataProvidingTestsuiteService) RegisterFiles(ctx context.Context, args *kurtosis_testsuite_rpc_api_bindings.RegisterFilesArgs) (*emptypb.Empty, error) {
-	return nil, stacktrace.NewError("Received a register files call while the testsuite service iis in metadata-providing mode; this is a bug in Kurtosis")
+	return nil, stacktrace.NewError("Received a register files call while the testsuite service is in metadata-providing mode; this is a bug in Kurtosis")
 }
 
 func (service MetadataProvidingTestsuiteService) SetupTest(ctx context.Context, args *kurtosis_testsuite_rpc_api_bindings.SetupTestArgs) (*emptypb.Empty, error) {
-	return nil, stacktrace.NewError("Received a setup test call while the testsuite service iis in metadata-providing mode; this is a bug in Kurtosis")
+	return nil, stacktrace.NewError("Received a setup test call while the testsuite service is in metadata-providing mode; this is a bug in Kurtosis")
 }
 
 func (service MetadataProvidingTestsuiteService) RunTest(ctx context.Context, args *kurtosis_testsuite_rpc_api_bindings.RunTestArgs) (*emptypb.Empty, error) {
-	return nil, stacktrace.NewError("Received a run test call while the testsuite service iis in metadata-providing mode; this is a bug in Kurtosis")
+	return nil, stacktrace.NewError("Received a run test call while the testsuite service is in metadata-providing mode; this is a bug in Kurtosis")
 }
 

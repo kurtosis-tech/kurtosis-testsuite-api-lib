@@ -25,3 +25,4 @@ type TestConfiguration struct {
 	// Docs available at https://docs.kurtosistech.com/kurtosis-testsuite-api-lib/lib-documentation
 	FilesArtifactUrls map[services.FilesArtifactID]string
 }
+
