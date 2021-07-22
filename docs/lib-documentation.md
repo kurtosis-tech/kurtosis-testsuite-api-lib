@@ -78,6 +78,9 @@ The amount of time a test has to finish the [Test.run][test_run] phase. If the p
 ### bool isPartitioningEnabled
 Setting this to true allows a test to make use of the [NetworkContext.repartitionNetwork][networkcontext_repartitionnetwork] method. This is a configuration flag (rather than enabled by default) because enabling repartitioning requires spinning up extra sidecar Docker containers, and thus an extra load on the system running Kurtosis.
 
+### Map\<String, String\> staticFileFilepaths
+Mapping of static_file_id -> filepath_on_current_container, where each entry is a static file that the Kurtosis engine should now about so that it can use it to start services. The static file IDs declared here are the same ones that should be used for [ServiceContext.loadStaticFiles][servicecontext_loadstaticfiles] and [ContainerCreationConfig.usedStaticFiles][containercreationconfig_usedstaticfiles].
+
 <!-- TODO change key type to FilesArtifactID -->
 ### Map\<String, String\> filesArtifactUrls
 Mapping of a user-defined key -> URL of a gzipped TAR whose contents the test will mount on a service. This should be left empty if no files artifacts are needed. For more details on what files artifacts are, see [ContainerCreationConfig.filesArtifactMountpoints][containercreationconfig_filesartifactmountpoints].
@@ -105,13 +108,6 @@ Map of test name -> test object.
 ### getNetworkWidthBits() -\> uint32
 Determines the width (in bits) of the Docker network that Kurtosis will create for each test. The maximum number of IP addresses that any test can use will be 2 ^ network_width_bits, which determines the maximum number of services that can be running at any given time in a testnet. This number should be set high enough that no test will run out of IP addresses, but low enough that the Docker environment doesn't run out of IP addresses (`8` is a good value to start with).
 
-### getStaticFiles() -\> Map\<String, String\>
-Defines the static files inside the testsuite container that are available for use when starting services. 
-
-**Returns**
-
-Map of user-defined ID -> absolute filepath inside the testsuite container where the file lives. The user-defined ID is arbitrary, and will be used when starting a service that wants to use the corresponding static file.
-
 
 ---
 
@@ -121,14 +117,15 @@ _Found a bug? File it on [the repo](https://github.com/kurtosis-tech/kurtosis-li
 <!-- TODO Make the function definition not include args or return values, so we don't get these huge ugly links that break if we change the function signature -->
 <!-- TODO make the reference names a) be properly-cased (e.g. "Service.isAvailable" rather than "service_isavailable") and b) have an underscore in front of them, so they're easy to find-replace without accidentally over-replacing -->
 
-[containerconfigfactory]: ../kurtosis-client/lib-documentation##containerconfigfactorys-extends-service
-[containerconfigfactory_getrunconfig]: ../kurtosis-client/lib-documentation##getrunconfigstring-containeripaddr-mapstring-string-generatedfilefilepaths---containerrunconfig
+[containerconfigfactory]: ../kurtosis-client/lib-documentation#containerconfigfactorys-extends-service
+[containerconfigfactory_getrunconfig]: ../kurtosis-client/lib-documentation#getrunconfigstring-containeripaddr-mapstring-string-generatedfilefilepaths---containerrunconfig
 
 [containercreationconfig]: ../kurtosis-client/lib-documentation#containercreationconfig
 [containercreationconfig_usedports]: ../kurtosis-client/lib-documentation#setstring-usedports
 [containercreationconfig_filegeneratingfuncs]: ../kurtosis-client/lib-documentation#mapstring-funcfile-filegeneratingfuncs
 [containercreationconfig_filesartifactmountpoints]: ../kurtosis-client/lib-documentation#mapstring-string-filesartifactmountpoints
 [containercreationconfig_servicecreatingfunc]: ../kurtosis-client/lib-documentation#funcservicecontext---s-servicecreatingfunc
+[containercreationconfig_usedstaticfiles]: ../kurtosis-client/lib-documentation#setstaticfileid-usedstaticfiles
 
 [containercreationconfigbuilder]: ../kurtosis-client/lib-documentation#containercreationconfigbuilder
 
@@ -145,9 +142,10 @@ _Found a bug? File it on [the repo](https://github.com/kurtosis-tech/kurtosis-li
 
 [partitionconnectioninfo]: ../kurtosis-client/lib-documentation#partitionconnectioninfo
 
-[servicecontext]: ../kurtosis-client/lib-documentation##servicecontext
+[servicecontext]: ../kurtosis-client/lib-documentation#servicecontext
+[servicecontext_loadstaticfiles]: ../kurtosis-client/lib-documentation#loadstaticfilessetstring-usedstaticfiles---mapstring-string
 
-[generatedfilefilepaths]: ../kurtosis-client/lib-documentation##generatedfilefilepaths
+[generatedfilefilepaths]: ../kurtosis-client/lib-documentation#generatedfilefilepaths
 
 [test]: #testn-extends-network
 [test_configure]: #configuretestconfigurationbuilder-builder

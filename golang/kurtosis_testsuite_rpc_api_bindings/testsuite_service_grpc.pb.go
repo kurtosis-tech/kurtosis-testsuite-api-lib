@@ -22,13 +22,11 @@ type TestSuiteServiceClient interface {
 	// Endpoint to verify the gRPC server is actually up before making any real calls
 	IsAvailable(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetTestSuiteMetadata(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*TestSuiteMetadata, error)
-	// Will be called by Kurtosis itself, telling the testsuite container to copy static files contained in the testsuite
-	//  to the suite execution volume so that API containers can use them when starting services
-	CopyStaticFilesToExecutionVolume(ctx context.Context, in *CopyStaticFilesToExecutionVolumeArgs, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// Will be called by the test initializer container, telling the testsuite container to register static files & files artifacts
+	//  so that they're available in the API container before the tests start running
+	RegisterFiles(ctx context.Context, in *RegisterFilesArgs, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	SetupTest(ctx context.Context, in *SetupTestArgs, opts ...grpc.CallOption) (*emptypb.Empty, error)
-	// We don't need args dictating what test to run because SetupTest already indicates it (and it wouldn't make
-	//  sense to setup one test and run another)
-	RunTest(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	RunTest(ctx context.Context, in *RunTestArgs, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type testSuiteServiceClient struct {
@@ -57,9 +55,9 @@ func (c *testSuiteServiceClient) GetTestSuiteMetadata(ctx context.Context, in *e
 	return out, nil
 }
 
-func (c *testSuiteServiceClient) CopyStaticFilesToExecutionVolume(ctx context.Context, in *CopyStaticFilesToExecutionVolumeArgs, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *testSuiteServiceClient) RegisterFiles(ctx context.Context, in *RegisterFilesArgs, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/test_suite_api.TestSuiteService/CopyStaticFilesToExecutionVolume", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/test_suite_api.TestSuiteService/RegisterFiles", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +73,7 @@ func (c *testSuiteServiceClient) SetupTest(ctx context.Context, in *SetupTestArg
 	return out, nil
 }
 
-func (c *testSuiteServiceClient) RunTest(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *testSuiteServiceClient) RunTest(ctx context.Context, in *RunTestArgs, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, "/test_suite_api.TestSuiteService/RunTest", in, out, opts...)
 	if err != nil {
@@ -91,13 +89,11 @@ type TestSuiteServiceServer interface {
 	// Endpoint to verify the gRPC server is actually up before making any real calls
 	IsAvailable(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
 	GetTestSuiteMetadata(context.Context, *emptypb.Empty) (*TestSuiteMetadata, error)
-	// Will be called by Kurtosis itself, telling the testsuite container to copy static files contained in the testsuite
-	//  to the suite execution volume so that API containers can use them when starting services
-	CopyStaticFilesToExecutionVolume(context.Context, *CopyStaticFilesToExecutionVolumeArgs) (*emptypb.Empty, error)
+	// Will be called by the test initializer container, telling the testsuite container to register static files & files artifacts
+	//  so that they're available in the API container before the tests start running
+	RegisterFiles(context.Context, *RegisterFilesArgs) (*emptypb.Empty, error)
 	SetupTest(context.Context, *SetupTestArgs) (*emptypb.Empty, error)
-	// We don't need args dictating what test to run because SetupTest already indicates it (and it wouldn't make
-	//  sense to setup one test and run another)
-	RunTest(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
+	RunTest(context.Context, *RunTestArgs) (*emptypb.Empty, error)
 	mustEmbedUnimplementedTestSuiteServiceServer()
 }
 
@@ -111,13 +107,13 @@ func (UnimplementedTestSuiteServiceServer) IsAvailable(context.Context, *emptypb
 func (UnimplementedTestSuiteServiceServer) GetTestSuiteMetadata(context.Context, *emptypb.Empty) (*TestSuiteMetadata, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTestSuiteMetadata not implemented")
 }
-func (UnimplementedTestSuiteServiceServer) CopyStaticFilesToExecutionVolume(context.Context, *CopyStaticFilesToExecutionVolumeArgs) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CopyStaticFilesToExecutionVolume not implemented")
+func (UnimplementedTestSuiteServiceServer) RegisterFiles(context.Context, *RegisterFilesArgs) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RegisterFiles not implemented")
 }
 func (UnimplementedTestSuiteServiceServer) SetupTest(context.Context, *SetupTestArgs) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetupTest not implemented")
 }
-func (UnimplementedTestSuiteServiceServer) RunTest(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
+func (UnimplementedTestSuiteServiceServer) RunTest(context.Context, *RunTestArgs) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RunTest not implemented")
 }
 func (UnimplementedTestSuiteServiceServer) mustEmbedUnimplementedTestSuiteServiceServer() {}
@@ -169,20 +165,20 @@ func _TestSuiteService_GetTestSuiteMetadata_Handler(srv interface{}, ctx context
 	return interceptor(ctx, in, info, handler)
 }
 
-func _TestSuiteService_CopyStaticFilesToExecutionVolume_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CopyStaticFilesToExecutionVolumeArgs)
+func _TestSuiteService_RegisterFiles_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RegisterFilesArgs)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TestSuiteServiceServer).CopyStaticFilesToExecutionVolume(ctx, in)
+		return srv.(TestSuiteServiceServer).RegisterFiles(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/test_suite_api.TestSuiteService/CopyStaticFilesToExecutionVolume",
+		FullMethod: "/test_suite_api.TestSuiteService/RegisterFiles",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TestSuiteServiceServer).CopyStaticFilesToExecutionVolume(ctx, req.(*CopyStaticFilesToExecutionVolumeArgs))
+		return srv.(TestSuiteServiceServer).RegisterFiles(ctx, req.(*RegisterFilesArgs))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -206,7 +202,7 @@ func _TestSuiteService_SetupTest_Handler(srv interface{}, ctx context.Context, d
 }
 
 func _TestSuiteService_RunTest_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(emptypb.Empty)
+	in := new(RunTestArgs)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -218,7 +214,7 @@ func _TestSuiteService_RunTest_Handler(srv interface{}, ctx context.Context, dec
 		FullMethod: "/test_suite_api.TestSuiteService/RunTest",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TestSuiteServiceServer).RunTest(ctx, req.(*emptypb.Empty))
+		return srv.(TestSuiteServiceServer).RunTest(ctx, req.(*RunTestArgs))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -239,8 +235,8 @@ var TestSuiteService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _TestSuiteService_GetTestSuiteMetadata_Handler,
 		},
 		{
-			MethodName: "CopyStaticFilesToExecutionVolume",
-			Handler:    _TestSuiteService_CopyStaticFilesToExecutionVolume_Handler,
+			MethodName: "RegisterFiles",
+			Handler:    _TestSuiteService_RegisterFiles_Handler,
 		},
 		{
 			MethodName: "SetupTest",

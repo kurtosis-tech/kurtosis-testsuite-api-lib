@@ -15,6 +15,7 @@ type TestConfigurationBuilder struct {
 	setupTimeoutSeconds uint32
 	runTimeoutSeconds uint32
 	isPartioningEnabled bool
+	staticFileFilepaths map[services.StaticFileID]string
 	filesArtifactUrls map[services.FilesArtifactID]string
 }
 
@@ -23,6 +24,7 @@ func NewTestConfigurationBuilder() *TestConfigurationBuilder {
 		setupTimeoutSeconds: defaultSetupTimeoutSeconds,
 		runTimeoutSeconds:   defaultRunTimeoutSeconds,
 		isPartioningEnabled: defaultPartitioningEnabled,
+		staticFileFilepaths: map[services.StaticFileID]string{},
 		filesArtifactUrls:   map[services.FilesArtifactID]string{},
 	}
 }
@@ -42,7 +44,14 @@ func (builder *TestConfigurationBuilder) WithPartitioningEnabled(isPartitioningE
 	return builder
 }
 
+func (builder *TestConfigurationBuilder) WithStaticFileFilepaths(staticFileFilepaths map[services.StaticFileID]string) *TestConfigurationBuilder {
+	// TODO defensive copy
+	builder.staticFileFilepaths = staticFileFilepaths
+	return builder
+}
+
 func (builder *TestConfigurationBuilder) WithFilesArtifactUrls(filesArtifactUrls map[services.FilesArtifactID]string) *TestConfigurationBuilder {
+	// TODO defensive copy
 	builder.filesArtifactUrls = filesArtifactUrls
 	return builder
 }
@@ -52,6 +61,7 @@ func (builder TestConfigurationBuilder) Build() *TestConfiguration {
 		SetupTimeoutSeconds:   builder.setupTimeoutSeconds,
 		RunTimeoutSeconds:     builder.runTimeoutSeconds,
 		IsPartitioningEnabled: builder.isPartioningEnabled,
+		StaticFileFilepaths:   builder.staticFileFilepaths,
 		FilesArtifactUrls:     builder.filesArtifactUrls,
 	}
 }
