@@ -1,6 +1,6 @@
 # TBD
 ### Changes
-* Use Kurtosis Client vTODOOOOOOOOOOOOOOOOOOOo
+* Use Kurtosis Client to v0.10.0
 * Static files are now defined on a per-test level (rather than per-testsuite level), and added a `TestConfigurationBuilder.withStaticFileFilepaths` method for defining a test's usage of static files
 * The `CopyStaticFilesToExecutionVolume` testsuite service endpoint has been removed and replaced with the `RegisterFiles`, which now registers both static files AND files artifacts
     * This endpoint will now call down to `NetworkContext.registerStaticFiles` and `NetworkContext.registerFilesArtifacts`
