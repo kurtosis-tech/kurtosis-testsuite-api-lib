@@ -1,4 +1,6 @@
 # TBD
+
+# 0.3.0
 ### Changes
 * Use Kurtosis Client to v0.10.0
 * Static files are now defined on a per-test level (rather than per-testsuite level), and added a `TestConfigurationBuilder.withStaticFileFilepaths` method for defining a test's usage of static files
