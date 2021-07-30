@@ -159,8 +159,7 @@ proto.test_suite_api.TestSuiteMetadata.prototype.toObject = function(opt_include
  */
 proto.test_suite_api.TestSuiteMetadata.toObject = function(includeInstance, msg) {
   var f, obj = {
-    testMetadataMap: (f = msg.getTestMetadataMap()) ? f.toObject(includeInstance, proto.test_suite_api.TestMetadata.toObject) : [],
-    networkWidthBits: jspb.Message.getFieldWithDefault(msg, 2, 0)
+    testMetadataMap: (f = msg.getTestMetadataMap()) ? f.toObject(includeInstance, proto.test_suite_api.TestMetadata.toObject) : []
   };
 
   if (includeInstance) {
@@ -203,10 +202,6 @@ proto.test_suite_api.TestSuiteMetadata.deserializeBinaryFromReader = function(ms
         jspb.Map.deserializeBinary(message, reader, jspb.BinaryReader.prototype.readString, jspb.BinaryReader.prototype.readMessage, proto.test_suite_api.TestMetadata.deserializeBinaryFromReader, "", new proto.test_suite_api.TestMetadata());
          });
       break;
-    case 2:
-      var value = /** @type {number} */ (reader.readUint32());
-      msg.setNetworkWidthBits(value);
-      break;
     default:
       reader.skipField();
       break;
@@ -240,13 +235,6 @@ proto.test_suite_api.TestSuiteMetadata.serializeBinaryToWriter = function(messag
   if (f && f.getLength() > 0) {
     f.serializeBinary(1, writer, jspb.BinaryWriter.prototype.writeString, jspb.BinaryWriter.prototype.writeMessage, proto.test_suite_api.TestMetadata.serializeBinaryToWriter);
   }
-  f = message.getNetworkWidthBits();
-  if (f !== 0) {
-    writer.writeUint32(
-      2,
-      f
-    );
-  }
 };
 
 
@@ -270,24 +258,6 @@ proto.test_suite_api.TestSuiteMetadata.prototype.getTestMetadataMap = function(o
 proto.test_suite_api.TestSuiteMetadata.prototype.clearTestMetadataMap = function() {
   this.getTestMetadataMap().clear();
   return this;};
-
-
-/**
- * optional uint32 network_width_bits = 2;
- * @return {number}
- */
-proto.test_suite_api.TestSuiteMetadata.prototype.getNetworkWidthBits = function() {
-  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 2, 0));
-};
-
-
-/**
- * @param {number} value
- * @return {!proto.test_suite_api.TestSuiteMetadata} returns this
- */
-proto.test_suite_api.TestSuiteMetadata.prototype.setNetworkWidthBits = function(value) {
-  return jspb.Message.setProto3IntField(this, 2, value);
-};
 
 
 
