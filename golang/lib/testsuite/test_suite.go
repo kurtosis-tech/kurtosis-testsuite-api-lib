@@ -9,7 +9,4 @@ package testsuite
 type TestSuite interface {
 	// Docs available at https://docs.kurtosistech.com/kurtosis-testsuite-api-lib/lib-documentation
 	GetTests() map[string]Test
-
-	// Docs available at https://docs.kurtosistech.com/kurtosis-testsuite-api-lib/lib-documentation
-	GetNetworkWidthBits() uint32
 }
