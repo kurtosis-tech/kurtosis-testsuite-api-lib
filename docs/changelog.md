@@ -1,4 +1,10 @@
 # TBD
+### Removed
+* Removed the `TestSuite.getNetworkWidthBits()` method, as it's no longer necessary given that we're going to hardcode the enclave width
+
+### Breaking Changes
+* Removed the `TestSuite.getNetworkWidthBits()` method
+    * Users should remove this method from their testsuite
 
 # 0.3.0
 ### Changes

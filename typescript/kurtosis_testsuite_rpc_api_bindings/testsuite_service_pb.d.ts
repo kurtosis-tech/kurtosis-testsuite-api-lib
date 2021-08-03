@@ -7,9 +7,6 @@ import * as google_protobuf_empty_pb from "google-protobuf/google/protobuf/empty
 export class TestSuiteMetadata extends jspb.Message {
   getTestMetadataMap(): jspb.Map<string, TestMetadata>;
   clearTestMetadataMap(): void;
-  getNetworkWidthBits(): number;
-  setNetworkWidthBits(value: number): void;
-
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): TestSuiteMetadata.AsObject;
   static toObject(includeInstance: boolean, msg: TestSuiteMetadata): TestSuiteMetadata.AsObject;
@@ -23,7 +20,6 @@ export class TestSuiteMetadata extends jspb.Message {
 export namespace TestSuiteMetadata {
   export type AsObject = {
     testMetadataMap: Array<[string, TestMetadata.AsObject]>,
-    networkWidthBits: number,
   }
 }
 
