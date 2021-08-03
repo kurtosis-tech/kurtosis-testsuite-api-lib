@@ -1,4 +1,6 @@
 # TBD
+
+# 0.4.0
 ### Removed
 * Removed the `TestSuite.getNetworkWidthBits()` method, as it's no longer necessary given that we're going to hardcode the enclave width
 
