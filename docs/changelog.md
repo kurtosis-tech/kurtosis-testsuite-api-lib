@@ -1,5 +1,14 @@
 # TBD
 
+# 0.4.0
+### Removed
+* Removed the `TestSuite.getNetworkWidthBits()` method, as it's no longer necessary given that we're going to hardcode the enclave width
+
+### Breaking Changes
+* Removed the `TestSuite.getNetworkWidthBits()` method
+    * Users should remove this method from their testsuite
+* Upgraded to [Kurtosis Client 0.11.0](https://github.com/kurtosis-tech/kurtosis-client/blob/develop/docs/changelog.md#1110)
+
 # 0.3.0
 ### Changes
 * Use Kurtosis Client to v0.10.0

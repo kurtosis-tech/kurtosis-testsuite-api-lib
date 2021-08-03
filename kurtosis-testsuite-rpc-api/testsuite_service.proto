@@ -28,8 +28,6 @@ service TestSuiteService {
 message TestSuiteMetadata {
   // Mapping of testName -> testMetadata
   map<string, TestMetadata> test_metadata = 1;
-
-  uint32 network_width_bits = 2;
 }
 
 message TestMetadata {

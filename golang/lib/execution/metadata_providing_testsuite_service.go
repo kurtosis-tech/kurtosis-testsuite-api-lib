@@ -37,10 +37,8 @@ func (service MetadataProvidingTestsuiteService) GetTestSuiteMetadata(ctx contex
 		allTestMetadata[testName] = testMetadata
 	}
 
-	networkWidthBits := service.suite.GetNetworkWidthBits()
 	testSuiteMetadata := &kurtosis_testsuite_rpc_api_bindings.TestSuiteMetadata{
 		TestMetadata:     allTestMetadata,
-		NetworkWidthBits: networkWidthBits,
 	}
 
 	return testSuiteMetadata, nil
