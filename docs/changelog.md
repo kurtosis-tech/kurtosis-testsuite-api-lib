@@ -1,4 +1,6 @@
 # TBD
+### Fixes
+* Replaced references to "Kurtosis Lib" in the changelog with "testsuite API lib"
 
 # 0.4.0
 ### Removed
