@@ -1,4 +1,6 @@
 # TBD
+### Changes
+* Added Apache-2 licensing
 
 # 0.4.0
 ### Removed
