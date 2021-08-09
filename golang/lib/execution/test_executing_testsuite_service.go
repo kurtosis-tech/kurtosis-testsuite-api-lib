@@ -121,6 +121,8 @@ func (service TestExecutingTestsuiteService) RunTest(ctx context.Context, args *
 
 	logrus.Infof("Running test logic for test '%v'...", testName)
 	if err := runTest(test, service.postSetupNetwork); err != nil {
+		logrus.Infof("--LEO-- Test Name '%v'...", testName)
+		logrus.Infof("--LEO-- Error '%v'...", err.Error())
 		return nil, stacktrace.Propagate(
 			err,
 			"An error occurred running test '%v'",
