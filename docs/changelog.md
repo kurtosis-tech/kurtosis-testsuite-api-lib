@@ -1,5 +1,5 @@
 # TBD
-### Changes
+### Features
 * Added typescript build script for compiling all typescript files into a single .js file
 
 ### Fixes
