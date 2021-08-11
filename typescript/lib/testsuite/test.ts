@@ -7,7 +7,7 @@
 import { Result } from "neverthrow";
 
 // Docs available at https://docs.kurtosistech.com/kurtosis-testsuite-api-lib/lib-documentation
-interface Test {
+export interface Test {
 	// Docs available at https://docs.kurtosistech.com/kurtosis-testsuite-api-lib/lib-documentation
 	configure(TestConfigurationBuilder): void;
 
