@@ -11,36 +11,49 @@ class TestConfiguration {
 	// Docs available at https://docs.kurtosistech.com/kurtosis-testsuite-api-lib/lib-documentation
 	private readonly setupTimeoutSeconds: number;
 
+	// Docs available at https://docs.kurtosistech.com/kurtosis-testsuite-api-lib/lib-documentation
+	private readonly runTimeoutSeconds: number;
+
+	// Docs available at https://docs.kurtosistech.com/kurtosis-testsuite-api-lib/lib-documentation
+	private readonly isPartitioningEnabled: boolean;
+
+	// Docs available at https://docs.kurtosistech.com/kurtosis-testsuite-api-lib/lib-documentation
+	private readonly staticFileFilepaths: Map<services.StaticFileID, string>;
+
+	// Docs available at https://docs.kurtosistech.com/kurtosis-testsuite-api-lib/lib-documentation
+	private readonly filesArtifactUrls: Map<services.FilesArtifactID, string>;
+
+    constructor(
+        setupTimeoutSeconds: number, 
+        runTimeoutSeconds: number, 
+        isPartitioningEnabled: boolean, 
+        staticFileFilepaths: Map<services.StaticFileID, string>,
+        filesArtifactUrls: Map<services.FilesArtifactID, string>) {
+            this.setupTimeoutSeconds = setupTimeoutSeconds;
+            this.runTimeoutSeconds = runTimeoutSeconds;
+            this.isPartitioningEnabled = isPartitioningEnabled;
+            this.staticFileFilepaths = staticFileFilepaths;
+            this.filesArtifactUrls = filesArtifactUrls;
+    }
+
     public getSetupTimeoutSeconds(): number {
         return this.setupTimeoutSeconds;
     }
-
-	// Docs available at https://docs.kurtosistech.com/kurtosis-testsuite-api-lib/lib-documentation
-	private readonly runTimeoutSeconds: number;
 
     public getRunTimeoutSeconds(): number {
         return this.runTimeoutSeconds;
     }
 
-	// Docs available at https://docs.kurtosistech.com/kurtosis-testsuite-api-lib/lib-documentation
-	private readonly isPartitioningEnabled: boolean;
-
     public getIsPartitioningEnabled(): boolean {
         return this.isPartitioningEnabled;
     }
-
-	// Docs available at https://docs.kurtosistech.com/kurtosis-testsuite-api-lib/lib-documentation
-	private readonly staticFileFilepaths: Map<services.StaticFileID, string>;
 
     public getStaticFileFilepaths(): Map<services.StaticFileID, string> {
         return this.staticFileFilepaths;
     }
 
-	// Docs available at https://docs.kurtosistech.com/kurtosis-testsuite-api-lib/lib-documentation
-	private readonly filesArtifactUrls: Map<services.FilesArtifactID, string>;
-
-    public getFilesArtifactUrls(): Map<services.FilesArtifactID, string>{
-        return this.filesArtifactUrls;
+    public getStaticFileFilepaths(): Map<services.StaticFileID, string> {
+        return this.staticFileFilepaths;
     }
 }
 
