@@ -13,5 +13,5 @@ lang_root_dirpath="$(dirname "${script_dirpath}")"
 # # ==================================================================================================
 # #                                             Main Logic
 # # ==================================================================================================
-find_results="$(find ${lang_root_dirpath}/lib ${lang_root_dirpath}/kurtosis_testsuite_rpc_api_consts ${lang_root_dirpath}/kurtosis_testsuite_docker_api -name "*.ts")"
+find_results="$(find ${lang_root_dirpath} -name "*.ts" -not -path "${lang_root_dirpath}/kurtosis_testsuite_rpc_api_bindings/*")"
 tsc ${find_results} --outFile ${lang_root_dirpath}/build/output.js --module system --moduleResolution node --target es2015
