@@ -1,6 +1,6 @@
 // TODO Rename this envvar, since the testsuite can accept whatever it wants - doesn't have to be JSON
 enum KurtosisTestsuiteDockerEnvVar {
-    CustomParamsJson= "CUSTOM_PARAMS_JSON",
+    CustomParamsJson = "CUSTOM_PARAMS_JSON",
     DebuggerPort = "DEBUGGER_PORT",
     KurtosisApiSocket = "KURTOSIS_API_SOCKET", // Only populated if in test-running mode
     LogLevel = "LOG_LEVEL"
