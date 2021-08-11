@@ -1,6 +1,7 @@
 # TBD
 ### Features
 * Added typescript build script for compiling all typescript files into a single .js file
+* Added `lib/testsuite` files into typescript
 
 ### Fixes
 * Replaced references to "Kurtosis Lib" in the changelog with "testsuite API lib"
