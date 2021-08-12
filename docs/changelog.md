@@ -1,4 +1,7 @@
 # TBD
+### Changes
+* Added Apache-2 licensing
+
 ### Fixes
 * Replaced references to "Kurtosis Lib" in the changelog with "testsuite API lib"
 
