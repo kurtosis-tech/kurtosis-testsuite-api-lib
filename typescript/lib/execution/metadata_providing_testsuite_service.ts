@@ -1,5 +1,6 @@
-import { TestSuiteMetadata } from "../../kurtosis_testsuite_rpc_api_bindings/testsuite_service_pb";
-//"github.com/kurtosis-tech/kurtosis-testsuite-api-lib/golang/lib/testsuite" TODO TODO TODO
+import { TestMetadata, TestSuiteMetadata, RegisterFilesArgs, SetupTestArgs, RunTestArgs } from "../../kurtosis_testsuite_rpc_api_bindings/testsuite_service_pb";
+import { TestConfigurationBuilder } from "../testsuite";
+import { TestConfiguration } from "../testsuite";
 //"google.golang.org/protobuf/types/known/emptypb" TODO - potentially remove (maybe make this the any time)
 import { ok, err, Result } from "neverthrow";
 
@@ -17,36 +18,37 @@ class MetadataProvidingTestsuiteService {
 		return ok(empty); //TODO what about the error checking
 	}
 
-public getTestSuiteMetadata(empty: any): Result<TestSuiteMetadata, Error> {
-	const allTestMetadata: Map<string, TestSuiteMetadata> = new Map();
-	for testName, test := range service.suite.GetTests() {
-		testConfigBuilder := testsuite.NewTestConfigurationBuilder()
-		test.Configure(testConfigBuilder)
-		testConfig := testConfigBuilder.Build()
-		testMetadata := &kurtosis_testsuite_rpc_api_bindings.TestMetadata{
-			IsPartitioningEnabled: testConfig.IsPartitioningEnabled,
-			TestSetupTimeoutInSeconds: testConfig.SetupTimeoutSeconds,
-			TestRunTimeoutInSeconds: testConfig.RunTimeoutSeconds,
+	public getTestSuiteMetadata(empty: any): Result<TestSuiteMetadata, Error> {
+		const allTestMetadata: Map<string, TestSuiteMetadata> = new Map();
+		for [testName, test] of this.suite.GetTests().entries() {
+			const testConfigBuilder: TestConfigurationBuilder = new TestConfigurationBuilder();
+			test.Configure(testConfigBuilder);
+			const testConfig: TestConfiguration = testConfigBuilder.Build()
+			const testMetadata: TestMetadata = new TestMetadata(); //TODO TODO TODO - move to constructor calls
+			testMetadata.setIsPartitioningEnabled(testConfig.IsPartitioningEnabled);
+			testMetadata.setTestSetupTimeoutInSeconds(testConfig.SetupTimeoutSeconds);
+			testMetadata.setTestRunTimeoutInSeconds(testConfig.RunTimeoutSeconds);
+	
+			allTestMetadata[testName] = testMetadata;
 		}
-		allTestMetadata[testName] = testMetadata
+
+		const testSuiteMetadata = new TestSuiteMetadata();
+		const testSuiteMetadataMap: Map<string, TestSuiteMetadata> = testSuiteMetadata.getTestMetadataMap();
+		for (let allTestMetadataId in allTestMetadata) {
+			testSuiteMetadataMap.set(allTestMetadataId, allTestMetadata[allTestMetadataId]);
+		}
+		return ok(testSuiteMetadata); //TODO - what about error case?
 	}
 
-	testSuiteMetadata := &kurtosis_testsuite_rpc_api_bindings.TestSuiteMetadata{
-		TestMetadata:     allTestMetadata,
+	public registerFiles(args: RegisterFilesArgs): Result<any, Error> { //TODO, get rid of parameters, can make this only error
+		return err(new Error("Received a register files call while the testsuite service is in metadata-providing mode; this is a bug in Kurtosis"));
 	}
 
-	return testSuiteMetadata, nil
-}
+	public setupTest(args: SetupTestArgs): Result<any, Error> {
+		return err(new Error("Received a setup test call while the testsuite service is in metadata-providing mode; this is a bug in Kurtosis"));
+	}
 
-func (service MetadataProvidingTestsuiteService) RegisterFiles(ctx context.Context, args *kurtosis_testsuite_rpc_api_bindings.RegisterFilesArgs) (*emptypb.Empty, error) {
-	return nil, stacktrace.NewError("Received a register files call while the testsuite service is in metadata-providing mode; this is a bug in Kurtosis")
+	public runTest(args: RunTestArgs): Result< any, Error> {
+		return err(new Error("Received a run test call while the testsuite service is in metadata-providing mode; this is a bug in Kurtosis"));
+	}
 }
-
-func (service MetadataProvidingTestsuiteService) SetupTest(ctx context.Context, args *kurtosis_testsuite_rpc_api_bindings.SetupTestArgs) (*emptypb.Empty, error) {
-	return nil, stacktrace.NewError("Received a setup test call while the testsuite service is in metadata-providing mode; this is a bug in Kurtosis")
-}
-
-func (service MetadataProvidingTestsuiteService) RunTest(ctx context.Context, args *kurtosis_testsuite_rpc_api_bindings.RunTestArgs) (*emptypb.Empty, error) {
-	return nil, stacktrace.NewError("Received a run test call while the testsuite service is in metadata-providing mode; this is a bug in Kurtosis")
-}
-
