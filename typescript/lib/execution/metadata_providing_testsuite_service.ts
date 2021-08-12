@@ -1,6 +1,7 @@
 import { TestMetadata, TestSuiteMetadata, RegisterFilesArgs, SetupTestArgs, RunTestArgs } from "../../kurtosis_testsuite_rpc_api_bindings/testsuite_service_pb";
 import { TestConfigurationBuilder } from "../testsuite";
 import { TestConfiguration } from "../testsuite";
+import { TestSuite } from "../testsuite";
 //"google.golang.org/protobuf/types/known/emptypb" TODO - potentially remove (maybe make this the any time)
 import { ok, err, Result } from "neverthrow";
 
@@ -8,10 +9,10 @@ import { ok, err, Result } from "neverthrow";
 class MetadataProvidingTestsuiteService {
 	//kurtosis_testsuite_rpc_api_bindings.UnimplementedTestSuiteServiceServer //TODO 
 
-	private readonly suite: testsuite.TestSuite
+	private readonly suite: TestSuite
 
-	constructor(suite: testsuite.TestSuite) {
-		this.suite = testsuite.TestSuite;
+	constructor(suite: TestSuite) {
+		this.suite = TestSuite;
 	}
 
 	public isAvailable(empty: any): Result<any, Error> { //TODO - should I be changing empty to any type
@@ -20,7 +21,7 @@ class MetadataProvidingTestsuiteService {
 
 	public getTestSuiteMetadata(empty: any): Result<TestSuiteMetadata, Error> {
 		const allTestMetadata: Map<string, TestSuiteMetadata> = new Map();
-		for [testName, test] of this.suite.GetTests().entries() {
+		for ([testName, test] of this.suite.GetTests().entries()) {
 			const testConfigBuilder: TestConfigurationBuilder = new TestConfigurationBuilder();
 			test.Configure(testConfigBuilder);
 			const testConfig: TestConfiguration = testConfigBuilder.Build()
