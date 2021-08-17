@@ -4,6 +4,26 @@
 import * as jspb from "google-protobuf";
 import * as google_protobuf_empty_pb from "google-protobuf/google/protobuf/empty_pb";
 
+export class ModuleInfoResponse extends jspb.Message {
+  getUsedKurtosisApiVersion(): string;
+  setUsedKurtosisApiVersion(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ModuleInfoResponse.AsObject;
+  static toObject(includeInstance: boolean, msg: ModuleInfoResponse): ModuleInfoResponse.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: ModuleInfoResponse, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ModuleInfoResponse;
+  static deserializeBinaryFromReader(message: ModuleInfoResponse, reader: jspb.BinaryReader): ModuleInfoResponse;
+}
+
+export namespace ModuleInfoResponse {
+  export type AsObject = {
+    usedKurtosisApiVersion: string,
+  }
+}
+
 export class TestSuiteMetadata extends jspb.Message {
   getTestMetadataMap(): jspb.Map<string, TestMetadata>;
   clearTestMetadataMap(): void;

@@ -8,8 +8,7 @@ option go_package = "github.com/kurtosis-tech/kurtosis-testsuite-api-lib/golang/
 import "google/protobuf/empty.proto";
 
 service TestSuiteService {
-  // Endpoint to verify the gRPC server is actually up before making any real calls
-  rpc IsAvailable(google.protobuf.Empty) returns (google.protobuf.Empty) {};
+  rpc GetModuleInfo(google.protobuf.Empty) returns (ModuleInfoResponse) {};
 
   rpc GetTestSuiteMetadata(google.protobuf.Empty) returns (TestSuiteMetadata) {};
 
@@ -20,6 +19,14 @@ service TestSuiteService {
   rpc SetupTest(SetupTestArgs) returns (google.protobuf.Empty) {};
 
   rpc RunTest(RunTestArgs) returns (google.protobuf.Empty) {};
+}
+
+// ====================================================================================================
+//                                           GetModuleInfo
+// ====================================================================================================
+message ModuleInfoResponse {
+  // The version of the Kurtosis API that the testsuite container is using, which will tell us what version of the initializer/API containers that we need to launch
+  string used_kurtosis_api_version = 1;
 }
 
 // ====================================================================================================

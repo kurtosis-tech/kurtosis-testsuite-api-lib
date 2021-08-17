@@ -16,6 +16,17 @@ function deserialize_google_protobuf_Empty(buffer_arg) {
   return google_protobuf_empty_pb.Empty.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_test_suite_api_ModuleInfoResponse(arg) {
+  if (!(arg instanceof testsuite_service_pb.ModuleInfoResponse)) {
+    throw new Error('Expected argument of type test_suite_api.ModuleInfoResponse');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_test_suite_api_ModuleInfoResponse(buffer_arg) {
+  return testsuite_service_pb.ModuleInfoResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_test_suite_api_RegisterFilesArgs(arg) {
   if (!(arg instanceof testsuite_service_pb.RegisterFilesArgs)) {
     throw new Error('Expected argument of type test_suite_api.RegisterFilesArgs');
@@ -62,17 +73,16 @@ function deserialize_test_suite_api_TestSuiteMetadata(buffer_arg) {
 
 
 var TestSuiteServiceService = exports.TestSuiteServiceService = {
-  // Endpoint to verify the gRPC server is actually up before making any real calls
-isAvailable: {
-    path: '/test_suite_api.TestSuiteService/IsAvailable',
+  getModuleInfo: {
+    path: '/test_suite_api.TestSuiteService/GetModuleInfo',
     requestStream: false,
     responseStream: false,
     requestType: google_protobuf_empty_pb.Empty,
-    responseType: google_protobuf_empty_pb.Empty,
+    responseType: testsuite_service_pb.ModuleInfoResponse,
     requestSerialize: serialize_google_protobuf_Empty,
     requestDeserialize: deserialize_google_protobuf_Empty,
-    responseSerialize: serialize_google_protobuf_Empty,
-    responseDeserialize: deserialize_google_protobuf_Empty,
+    responseSerialize: serialize_test_suite_api_ModuleInfoResponse,
+    responseDeserialize: deserialize_test_suite_api_ModuleInfoResponse,
   },
   getTestSuiteMetadata: {
     path: '/test_suite_api.TestSuiteService/GetTestSuiteMetadata',

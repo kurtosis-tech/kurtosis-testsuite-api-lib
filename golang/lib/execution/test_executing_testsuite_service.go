@@ -53,8 +53,8 @@ func NewTestExecutingTestsuiteService(suite testsuite.TestSuite, networkCtx *net
 	}
 }
 
-func (service TestExecutingTestsuiteService) IsAvailable(_ context.Context, _ *emptypb.Empty) (*emptypb.Empty, error) {
-	return &emptypb.Empty{}, nil
+func (service TestExecutingTestsuiteService) GetModuleInfo(ctx context.Context, empty *emptypb.Empty) (*kurtosis_testsuite_rpc_api_bindings.ModuleInfoResponse, error) {
+	return
 }
 
 func (service TestExecutingTestsuiteService) GetTestSuiteMetadata(ctx context.Context, empty *emptypb.Empty) (*kurtosis_testsuite_rpc_api_bindings.TestSuiteMetadata, error) {

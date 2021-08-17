@@ -19,8 +19,7 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type TestSuiteServiceClient interface {
-	// Endpoint to verify the gRPC server is actually up before making any real calls
-	IsAvailable(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	GetModuleInfo(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ModuleInfoResponse, error)
 	GetTestSuiteMetadata(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*TestSuiteMetadata, error)
 	// Will be called by the test initializer container, telling the testsuite container to register static files & files artifacts
 	//  so that they're available in the API container before the tests start running
@@ -37,9 +36,9 @@ func NewTestSuiteServiceClient(cc grpc.ClientConnInterface) TestSuiteServiceClie
 	return &testSuiteServiceClient{cc}
 }
 
-func (c *testSuiteServiceClient) IsAvailable(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error) {
-	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/test_suite_api.TestSuiteService/IsAvailable", in, out, opts...)
+func (c *testSuiteServiceClient) GetModuleInfo(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*ModuleInfoResponse, error) {
+	out := new(ModuleInfoResponse)
+	err := c.cc.Invoke(ctx, "/test_suite_api.TestSuiteService/GetModuleInfo", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -86,8 +85,7 @@ func (c *testSuiteServiceClient) RunTest(ctx context.Context, in *RunTestArgs, o
 // All implementations must embed UnimplementedTestSuiteServiceServer
 // for forward compatibility
 type TestSuiteServiceServer interface {
-	// Endpoint to verify the gRPC server is actually up before making any real calls
-	IsAvailable(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
+	GetModuleInfo(context.Context, *emptypb.Empty) (*ModuleInfoResponse, error)
 	GetTestSuiteMetadata(context.Context, *emptypb.Empty) (*TestSuiteMetadata, error)
 	// Will be called by the test initializer container, telling the testsuite container to register static files & files artifacts
 	//  so that they're available in the API container before the tests start running
@@ -101,8 +99,8 @@ type TestSuiteServiceServer interface {
 type UnimplementedTestSuiteServiceServer struct {
 }
 
-func (UnimplementedTestSuiteServiceServer) IsAvailable(context.Context, *emptypb.Empty) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method IsAvailable not implemented")
+func (UnimplementedTestSuiteServiceServer) GetModuleInfo(context.Context, *emptypb.Empty) (*ModuleInfoResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetModuleInfo not implemented")
 }
 func (UnimplementedTestSuiteServiceServer) GetTestSuiteMetadata(context.Context, *emptypb.Empty) (*TestSuiteMetadata, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTestSuiteMetadata not implemented")
@@ -129,20 +127,20 @@ func RegisterTestSuiteServiceServer(s grpc.ServiceRegistrar, srv TestSuiteServic
 	s.RegisterService(&TestSuiteService_ServiceDesc, srv)
 }
 
-func _TestSuiteService_IsAvailable_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _TestSuiteService_GetModuleInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TestSuiteServiceServer).IsAvailable(ctx, in)
+		return srv.(TestSuiteServiceServer).GetModuleInfo(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/test_suite_api.TestSuiteService/IsAvailable",
+		FullMethod: "/test_suite_api.TestSuiteService/GetModuleInfo",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TestSuiteServiceServer).IsAvailable(ctx, req.(*emptypb.Empty))
+		return srv.(TestSuiteServiceServer).GetModuleInfo(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -227,8 +225,8 @@ var TestSuiteService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*TestSuiteServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "IsAvailable",
-			Handler:    _TestSuiteService_IsAvailable_Handler,
+			MethodName: "GetModuleInfo",
+			Handler:    _TestSuiteService_GetModuleInfo_Handler,
 		},
 		{
 			MethodName: "GetTestSuiteMetadata",
