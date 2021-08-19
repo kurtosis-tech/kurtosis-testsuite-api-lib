@@ -7,7 +7,7 @@ import { TestSuite } from "../testsuite"; //TODO
 import { Result } from "neverthrow";
 
 // Docs available at https://docs.kurtosistech.com/kurtosis-testsuite-api-lib/lib-documentation
-interface TestSuiteConfigurator {
+export interface TestSuiteConfigurator {
 	// Docs available at https://docs.kurtosistech.com/kurtosis-testsuite-api-lib/lib-documentation
 	setLogLevel(logLevelStr: string): Error;
 

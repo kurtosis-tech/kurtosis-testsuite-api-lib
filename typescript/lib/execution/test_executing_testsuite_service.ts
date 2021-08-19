@@ -11,7 +11,7 @@ import * as mutex from "async-mutex";
 // "google.golang.org/protobuf/types/known/emptypb" - TODO potentiall remove
 
 // Service for handling endpoints when the testsuite is in test-executing mode - i.e., inside a testsnet and running a single test
-class TestExecutingTestsuiteService {
+class TestExecutingTestsuiteService { //TODO - implement an interface
 	// This embedding is required by gRPC
 	// private readonly kurtosis_testsuite_rpc_api_bindings.UnimplementedTestSuiteServiceServer //TODO - figure this out
 

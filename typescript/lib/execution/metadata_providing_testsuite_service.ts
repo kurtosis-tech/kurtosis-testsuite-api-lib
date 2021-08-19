@@ -6,7 +6,7 @@ import { TestSuite } from "../testsuite";
 import { ok, err, Result } from "neverthrow";
 
 // Service handlign endpoints when the testsuite is in metadata-providing mode - i.e. NOT running a testnet, without a connection to an API container
-class MetadataProvidingTestsuiteService {
+export class MetadataProvidingTestsuiteService {
 	//kurtosis_testsuite_rpc_api_bindings.UnimplementedTestSuiteServiceServer //TODO 
 
 	private readonly suite: TestSuite
