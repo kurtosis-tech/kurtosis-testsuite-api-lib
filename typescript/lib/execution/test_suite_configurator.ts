@@ -3,7 +3,7 @@
  * All Rights Reserved.
  */
 
-import { TestSuite } from "../testsuite"; //TODO
+import { TestSuite } from "../testsuite/test_suite"; //TODO
 import { Result } from "neverthrow";
 
 // Docs available at https://docs.kurtosistech.com/kurtosis-testsuite-api-lib/lib-documentation

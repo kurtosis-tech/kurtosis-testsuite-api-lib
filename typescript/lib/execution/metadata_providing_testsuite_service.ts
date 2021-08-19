@@ -1,55 +1,54 @@
+import { ITestSuiteServiceServer } from "../../kurtosis_testsuite_rpc_api_bindings/testsuite_service_grpc_pb";
 import { TestMetadata, TestSuiteMetadata, RegisterFilesArgs, SetupTestArgs, RunTestArgs } from "../../kurtosis_testsuite_rpc_api_bindings/testsuite_service_pb";
-import { TestConfigurationBuilder } from "../testsuite";
-import { TestConfiguration } from "../testsuite";
-import { TestSuite } from "../testsuite";
-//"google.golang.org/protobuf/types/known/emptypb" TODO - potentially remove (maybe make this the any time)
+import { TestConfigurationBuilder } from "../testsuite/test_configuration_builder"; //TODO
+import { TestConfiguration } from "../testsuite/test_configuration"; //TODO
+import { TestSuite } from "../testsuite/test_suite"; //TODO
+import { newTestMetadata } from "../constructor_calls";
 import { ok, err, Result } from "neverthrow";
 
 // Service handlign endpoints when the testsuite is in metadata-providing mode - i.e. NOT running a testnet, without a connection to an API container
-export class MetadataProvidingTestsuiteService {
-	//kurtosis_testsuite_rpc_api_bindings.UnimplementedTestSuiteServiceServer //TODO 
-
-	private readonly suite: TestSuite
+export class MetadataProvidingTestsuiteService implements ITestSuiteServiceServer{ //TODO - right server to implement?
+	private readonly suite: TestSuite;
 
 	constructor(suite: TestSuite) {
 		this.suite = TestSuite;
 	}
 
-	public isAvailable(empty: any): Result<any, Error> { //TODO - should I be changing empty to any type
-		return ok(empty); //TODO what about the error checking
+	public isAvailable(empty: null): Result<null, Error> { //TODO - should empty be null or google_protobuf_empty_pb.Empty as indicated in typescript bindings
+		return ok(empty);
 	}
 
-	public getTestSuiteMetadata(empty: any): Result<TestSuiteMetadata, Error> {
+	public getTestSuiteMetadata(empty: null): Result<TestSuiteMetadata, Error> {
 		const allTestMetadata: Map<string, TestSuiteMetadata> = new Map();
-		for ([testName, test] of this.suite.GetTests().entries()) {
+		for (let [testName, test] of this.suite.getTests().entries()) {
 			const testConfigBuilder: TestConfigurationBuilder = new TestConfigurationBuilder();
-			test.Configure(testConfigBuilder);
-			const testConfig: TestConfiguration = testConfigBuilder.Build()
-			const testMetadata: TestMetadata = new TestMetadata(); //TODO TODO TODO - move to constructor calls
-			testMetadata.setIsPartitioningEnabled(testConfig.IsPartitioningEnabled);
-			testMetadata.setTestSetupTimeoutInSeconds(testConfig.SetupTimeoutSeconds);
-			testMetadata.setTestRunTimeoutInSeconds(testConfig.RunTimeoutSeconds);
+			test.configure(testConfigBuilder);
+			const testConfig: TestConfiguration = testConfigBuilder.build();
+			const testMetadata: TestMetadata = newTestMetadata(
+				testConfig.isPartitioningEnabled, 
+				testConfig.setupTimeoutSeconds, 
+				testConfig.runTimeoutSeconds);
 	
 			allTestMetadata[testName] = testMetadata;
 		}
 
-		const testSuiteMetadata = new TestSuiteMetadata();
+		const testSuiteMetadata: TestSuiteMetadata = new TestSuiteMetadata();
 		const testSuiteMetadataMap: Map<string, TestSuiteMetadata> = testSuiteMetadata.getTestMetadataMap();
-		for (let allTestMetadataId in allTestMetadata) {
-			testSuiteMetadataMap.set(allTestMetadataId, allTestMetadata[allTestMetadataId]);
+		for (let [allTestMetadataId, allTestMetadataTestSuite] of allTestMetadata.entries()) {
+			testSuiteMetadataMap.set(allTestMetadataId, allTestMetadataTestSuite);
 		}
-		return ok(testSuiteMetadata); //TODO - what about error case?
+		return ok(testSuiteMetadata); //TODO - can there never be an error case?
 	}
 
-	public registerFiles(args: RegisterFilesArgs): Result<any, Error> { //TODO, get rid of parameters, can make this only error
+	public registerFiles(args: RegisterFilesArgs): Result<null, Error> { //TODO - parameter is unused
 		return err(new Error("Received a register files call while the testsuite service is in metadata-providing mode; this is a bug in Kurtosis"));
 	}
 
-	public setupTest(args: SetupTestArgs): Result<any, Error> {
+	public setupTest(args: SetupTestArgs): Result<null, Error> { //TODO
 		return err(new Error("Received a setup test call while the testsuite service is in metadata-providing mode; this is a bug in Kurtosis"));
 	}
 
-	public runTest(args: RunTestArgs): Result< any, Error> {
+	public runTest(args: RunTestArgs): Result<null, Error> { //TODO
 		return err(new Error("Received a run test call while the testsuite service is in metadata-providing mode; this is a bug in Kurtosis"));
 	}
 }
