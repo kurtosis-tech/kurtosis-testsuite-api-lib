@@ -3,11 +3,11 @@
  * All Rights Reserved.
  */
 
-//import "github.com/kurtosis-tech/kurtosis-client/golang/lib/services" //TODO TODO TODO - once kurt-client is done ported
+//import { StaticFileID, FilesArtifactID } from "kurtosis-js-lib" //TODO TODO TODO - once kurt-client npm package is published
 
-// TODO Make these fields private, with getters - TODO TODO TODO (Ali addressed this)
+// TODO Make these fields private, with getters -> TODO TODO TODO (Ali addressed this)
 // Docs available at https://docs.kurtosistech.com/kurtosis-testsuite-api-lib/lib-documentation
-class TestConfiguration {
+export class TestConfiguration {
 	// Docs available at https://docs.kurtosistech.com/kurtosis-testsuite-api-lib/lib-documentation
 	private readonly setupTimeoutSeconds: number;
 
@@ -24,16 +24,16 @@ class TestConfiguration {
 	private readonly filesArtifactUrls: Map<services.FilesArtifactID, string>;
 
     constructor(
-        setupTimeoutSeconds: number, 
-        runTimeoutSeconds: number, 
-        isPartitioningEnabled: boolean, 
-        staticFileFilepaths: Map<services.StaticFileID, string>,
-        filesArtifactUrls: Map<services.FilesArtifactID, string>) {
-            this.setupTimeoutSeconds = setupTimeoutSeconds;
-            this.runTimeoutSeconds = runTimeoutSeconds;
-            this.isPartitioningEnabled = isPartitioningEnabled;
-            this.staticFileFilepaths = staticFileFilepaths;
-            this.filesArtifactUrls = filesArtifactUrls;
+            setupTimeoutSeconds: number, 
+            runTimeoutSeconds: number, 
+            isPartitioningEnabled: boolean, 
+            staticFileFilepaths: Map<services.StaticFileID, string>,
+            filesArtifactUrls: Map<services.FilesArtifactID, string>) {
+        this.setupTimeoutSeconds = setupTimeoutSeconds;
+        this.runTimeoutSeconds = runTimeoutSeconds;
+        this.isPartitioningEnabled = isPartitioningEnabled;
+        this.staticFileFilepaths = staticFileFilepaths;
+        this.filesArtifactUrls = filesArtifactUrls;
     }
 
     public getSetupTimeoutSeconds(): number {
@@ -52,8 +52,8 @@ class TestConfiguration {
         return this.staticFileFilepaths;
     }
 
-    public getStaticFileFilepaths(): Map<services.StaticFileID, string> {
-        return this.staticFileFilepaths;
+    public getFilesArtifactUrls(): Map<services.StaticFileID, string> {
+        return this.filesArtifactUrls;
     }
 }
 

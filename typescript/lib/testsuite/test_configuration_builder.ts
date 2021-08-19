@@ -1,4 +1,5 @@
-//import "github.com/kurtosis-tech/kurtosis-client/golang/lib/services" // TODO TODO TODO - once kurt-client ported
+//import { StaticFileID, FilesArtifactID } from "kurtosis-js-lib" // TODO TODO TODO - once kurt-client npm package is published
+import { TestConfiguration } from "./test_configuration";
 
 // vvvvvvvvv Update the docs if you change these vvvvvvvvvvv
 const DEFAULT_SETUP_TIMEOUT_SECONDS = 180;
@@ -7,12 +8,12 @@ const DEFAULT_PARTITIONING_ENABLED = false;
 // ^^^^^^^^^ Update the docs if you change these ^^^^^^^^^^^
 
 // Docs available at https://docs.kurtosistech.com/kurtosis-testsuite-api-lib/lib-documentation
-class TestConfigurationBuilder {
+export class TestConfigurationBuilder {
 	private setupTimeoutSeconds: number;
 	private runTimeoutSeconds: number;
 	private isPartioningEnabled: boolean;
-	private staticFileFilepaths: Map<services.StaticFileID, string>
-	private filesArtifactUrls: Map<services.FilesArtifactID, string>
+	private staticFileFilepaths: Map<services.StaticFileID, string>;
+	private filesArtifactUrls: Map<services.FilesArtifactID, string>;
 
 
     constructor () {
