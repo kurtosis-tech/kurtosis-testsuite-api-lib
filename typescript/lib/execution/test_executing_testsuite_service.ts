@@ -4,7 +4,7 @@ import { Test } from "../testsuite/test"; //TODO
 import { TestSuite } from "../testsuite/test_suite"; //TODO
 import { TestConfigurationBuilder } from "../testsuite/test_configuration_builder"; //TODO
 import { TestConfiguration } from "../testsuite/test_configuration"; //TODO
-import { Network, NetworkContext } from "kurtosis-js-lib"; //TODO
+import { Network, NetworkContext } from "kurtosis-core-api-lib";
 import { Result, ok, err } from "neverthrow"; //TODO - might not be the right call to use this here
 import * as log from "loglevel";
 import * as mutex from "async-mutex";
@@ -33,15 +33,15 @@ export class TestExecutingTestsuiteService implements ITestSuiteServiceServer{ /
         this.networkCtx = networkCtx;
     }
 
-    public isAvailable(_: null): Result<null, Error> { //TODO - why is there an underscore instead of a parameter name like empty?
+    public isAvailable(_: null): Result<null, Error> { //TODO - fix method signature
         return ok(null); //TODO - what about error checking
     }
 
-    public getTestSuiteMetadata(empty: null): Result<TestSuiteMetadata, Error> { //TODO - unused parameter
+    public getTestSuiteMetadata(empty: null): Result<TestSuiteMetadata, Error> { //TODO - fix method signature (unused parameter)
         return err(new Error("Received a get suite metadata call while the testsuite service is in test-executing mode; this is a bug in Kurtosis")); //what about ok value?
     }
 
-    public async registerFiles(args: RegisterFilesArgs): Promise<Result<null, Error>> { //TODO
+    public async registerFiles(args: RegisterFilesArgs): Promise<Result<null, Error>> { //TODO - method signature?
         const testName: string = args.getTestName();
         const allTests: Map<string, Test> = this.suite.getTests();
         if (!allTests.has(testName)) { //TODO - making assumption that if key existing in Map, then value should be there too ; I think this should be alright
@@ -66,7 +66,7 @@ export class TestExecutingTestsuiteService implements ITestSuiteServiceServer{ /
         return ok(null);
     }
 
-    public setupTest(args: SetupTestArgs): Result<null, Error> { //TODO
+    public setupTest(args: SetupTestArgs): Result<null, Error> { //TODO - method signature
         const release = await this.postSetupNetworkMutex.acquire();
         try {
             if (this.postSetupNetwork != null) {
@@ -100,7 +100,7 @@ export class TestExecutingTestsuiteService implements ITestSuiteServiceServer{ /
         }
     }
 
-    public runTest(args: RunTestArgs): Result<null, Error> { //TODO
+    public runTest(args: RunTestArgs): Result<null, Error> { //TODO - method signature
         const release = await this.postSetupNetworkMutex.acquire();
         try {
 
@@ -118,9 +118,9 @@ export class TestExecutingTestsuiteService implements ITestSuiteServiceServer{ /
             const test: Test = allTests[testName];
   
             log.info("Running test logic for test '" + testName + "'...");
-            const runTestHelperErr: Error = this.runTestHelper(test, this.postSetupNetwork);
-            if (runTestHelperErr != null) {
-                return err(runTestHelperErr);
+            const runTestHelperResult: Result<null,Error> = this.runTestHelper(test, this.postSetupNetwork);
+            if (!runTestHelperResult.isOk()) {
+                return err(runTestHelperResult.error);
             }
             log.info("Ran test logic for test " + testName);
             return ok(null); //TODO

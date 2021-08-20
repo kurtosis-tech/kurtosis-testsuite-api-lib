@@ -2,6 +2,7 @@
 ### Features
 * Added typescript build script for compiling all typescript files into a single .js file
 * Ported over `kurtosis_testsuite_docker_api` and `kurtosis_testsuite_rpc_api_consts` to typescript
+* Added `lib/execution` files to typescript
 
 ### Fixes
 * Replaced references to "Kurtosis Lib" in the changelog with "testsuite API lib"
