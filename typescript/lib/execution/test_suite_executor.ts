@@ -1,14 +1,15 @@
-import { ITestSuiteServiceServer } from "../../kurtosis_testsuite_rpc_api_bindings/testsuite_service_grpc_pb";
+import { TestSuiteServiceService, ITestSuiteServiceService } from "../../kurtosis_testsuite_rpc_api_bindings/testsuite_service_grpc_pb";
 import { NetworkContext, newApiContainerServiceClient } from "kurtosis-core-api-lib"; //TODO
 import { TestExecutingTestsuiteService } from "./test_executing_testsuite_service";
 import { TestSuiteConfigurator } from "./test_suite_configurator";
 import { MetadataProvidingTestsuiteService } from "./metadata_providing_testsuite_service";
 import { TestSuite } from "../testsuite/test_suite"; //TODO
 import { KurtosisTestsuiteDockerEnvVar, ENCLAVE_DATA_VOLUME_MOUNTPOINT } from "../../kurtosis_testsuite_docker_api/kurtosis_testsuite_docker_api";
-//import { LISTEN_PORT, LISTEN_PROTOCOL } from "../../kurtosis_testsuite_rpc_api_consts/kurtosis_testsuite_rpc_api_consts"; //need for minimial_grpc_server
+import { LISTEN_PORT } from "../../kurtosis_testsuite_rpc_api_consts/kurtosis_testsuite_rpc_api_consts";
 //"github.com/kurtosis-tech/minimal-grpc-server/server" //TODO
 import { Result, err, ok } from "neverthrow";
 import * as grpc from "grpc";
+import * as log from "loglevel";
 
 //TODO Below
 //import { process } from "node"; //TODO - don't need line but need the dependency = npm i --save-dev @types/node for EnvVar
@@ -17,7 +18,11 @@ import * as dotenv from 'dotenv'; //"os" //TODO
 //import * as date from "date-fns"; //npm install date-fns --save
 
 dotenv.config();
-//const GRPC_SERVER_STOP_GRACE_PERIOD: number = 5 * time.Second; //TODO - needed for minimial GRPC server
+
+const GRPC_SERVER_STOP_GRACE_PERIOD_MILLIS: number = 5000;
+const INTERRUPT_SIGNAL: string = "SIGNINT"
+const QUIT_SIGNAL: string = "SIGQUIT"
+const TERM_SIGNAL: string = "SIGTERM"
 
 class TestSuiteExecutor {
 	private readonly configurator: TestSuiteConfigurator;
@@ -27,32 +32,29 @@ class TestSuiteExecutor {
         this.configurator = configurator;
     }
 
-    public run(): Result<null, Error> { //TODO - return type
-        // NOTE: This can be empty if the testsuite is in metadata-providing mode
-        const KurtosisApiSocket: KurtosisTestsuiteDockerEnvVar = KurtosisTestsuiteDockerEnvVar.KurtosisApiSocket; //TODO - why can't it see that its being read right below
-        const kurtosisApiSocketStr: string = process.env.KurtosisApiSocket; //TODO - Does this receive the environment variable, gives error if I do env.(......) and put something in brackets
+    public async run(): Promise<Result<null, Error>> { //TODO - return type
+      	// NOTE: This can be empty if the testsuite is in metadata-providing mode
+        const kurtosisApiSocketStr: string = process.env[KurtosisTestsuiteDockerEnvVar.KurtosisApiSocket];
 
-        const logLevel: KurtosisTestsuiteDockerEnvVar = KurtosisTestsuiteDockerEnvVar.LogLevel;
-        const logLevelStr: string = process.env.LogLevel;
-        
-        // if !found { //TODO - process.env does not return some form of error, so I can only check error is str is empty
-        //     return new Error("Expected an '%v' environment variable containing the log level string that the testsuite should log at, but none was found", logLevel);
-        // }
+        if (!(KurtosisTestsuiteDockerEnvVar.LogLevel in process.env)) {
+            return err(new Error("Expected an '" + KurtosisTestsuiteDockerEnvVar.LogLevel + "' environment variable containing the log level string that the testsuite should log at, but none was found"))
+        }
+        const logLevelStr: string = process.env[KurtosisTestsuiteDockerEnvVar.LogLevel];
         if (logLevelStr == "") {
-            return err(new Error("The '" + logLevel + "' loglevel environment variable was defined, but is emptystring"));
+            return err(new Error("The '" + KurtosisTestsuiteDockerEnvVar.LogLevel + "' loglevel environment variable was defined, but is emptystring"));
         }
 
-        const customParamsJsonEnvVar: KurtosisTestsuiteDockerEnvVar = KurtosisTestsuiteDockerEnvVar.CustomParamsJson;
-        const customSerializedParamsStr: string = process.env.customParamsJsonEnvVar;
-        // if !found { //TODO
-        //     return stacktrace.NewError("Expected an '%v' environment variable containing the serialized custom params that the testsuite will consume, but none was found", kurtosis_testsuite_docker_api.CustomParamsJsonEnvVar)
-        // }
+        if (!(KurtosisTestsuiteDockerEnvVar.CustomParamsJson in process.env)) {
+            return err(new Error("Expected an '" + KurtosisTestsuiteDockerEnvVar.CustomParamsJson + "' environment variable containing the serialized custom params that the testsuite will consume, but none was found"));
+        }
+        const customSerializedParamsStr: string = process.env[KurtosisTestsuiteDockerEnvVar.CustomParamsJson];
         if (customSerializedParamsStr == "") {
-            return err(new Error("The '" + customParamsJsonEnvVar + "' serialized custom params environment variable was defined, but is emptystring"));
+            return err(new Error("The '" + KurtosisTestsuiteDockerEnvVar.CustomParamsJson + "' serialized custom params environment variable was defined, but is emptystring"));
         }
 
+        // TODO This should use Result<null>!
         const logLevelErr: Error = this.configurator.setLogLevel(logLevelStr);
-        if (logLevelErr != null) {
+        if (logLevelErr !== null) {
             return err(logLevelErr);
         }
 
@@ -62,17 +64,16 @@ class TestSuiteExecutor {
         }
         const suite: TestSuite = parseParamsAndCreateSuiteResult.value;
 
-        var testsuiteService: ITestSuiteServiceServer; //TODO
-        if (kurtosisApiSocketStr == "") {
+        let testsuiteService: ITestSuiteServiceService;
+        if (kurtosisApiSocketStr === "") {
             testsuiteService = new MetadataProvidingTestsuiteService(suite)
         } else {
 
             // TODO SECURITY: Use HTTPS to ensure we're connecting to the real Kurtosis API servers
-            const conn: grpc.Client = new grpc.Client(kurtosisApiSocketStr, grpc.credentials~ChannelCredentials); //TODO - grpc.ChannelCredentials, error checking with grpc.Client, would grpc.handleUnaryCall get the job done like grpc.Dial in golang?
-            if (error != null) { //TODO Error checking
-                return err(error);
-            }
+            // TODO need to wrap this in exception-handling
+            const conn: grpc.Client = new grpc.Client(kurtosisApiSocketStr, grpc.credentials.createInsecure());
 
+            // TODO Your try-finally needs to be a lot bigger than this - as-is, this connection will get closed almost immediately (long before the server starts)
             try {
                 const apiContainerClient: newApiContainerServiceClient = newApiContainerServiceClient(conn);
                 const networkCtx: NetworkContext = NetworkContext(apiContainerClient, ENCLAVE_DATA_VOLUME_MOUNTPOINT);
@@ -82,22 +83,50 @@ class TestSuiteExecutor {
             }
         }
 
-        const testsuiteServiceRegistrationFunc: (grpcServer: grpc.Server) => void = (grpcServer: grpc.Server) => {
-            kurtosis_testsuite_rpc_api_bindings.RegisterTestSuiteServiceServer(grpcServer, testsuiteService) //TODO - RegisterTestSuiteServiceServer (no such line)
+        // TODO Extract this to minimal-grpc-server
+        const server = new grpc.Server();
+        server.addService(TestSuiteServiceService, testsuiteService);
+        const listenUrl: string = ":" + LISTEN_PORT;
+        const boundPort: number = server.bind(listenUrl, grpc.credentials.createInsecure());
+        if (boundPort === 0) {
+            return err(new Error("An error occurred binding the server to listen URL '"+ boundPort +"'"));
         }
 
-        //TODO TODO TODO - don't need this right now, but needed when we hit lambda-api-lib
-        // testsuiteServer := server.NewMinimalGRPCServer(
-        //     kurtosis_testsuite_rpc_api_consts.ListenPort,
-        //     kurtosis_testsuite_rpc_api_consts.ListenProtocol,
-        //     GRPC_SERVER_STOP_GRACE_PERIOD,
-        //     []func(desc *grpc.Server) {
-        //         testsuiteServiceRegistrationFunc,
-        //     },
-        // )
-        // if err := testsuiteServer.Run(); err != nil {
-        //     return stacktrace.Propagate(err, "An error occurred running the testsuite server")
-        // }
+        const signalsToHandle: Array<string> = [INTERRUPT_SIGNAL, QUIT_SIGNAL, TERM_SIGNAL]
+        const signalReceivedPromises: Array<Promise<Result<null, Error>>> = signalsToHandle.map((signal) => {
+            return new Promise((resolve, _unusedReject) => {
+                process.on(signal, () => {
+                    resolve(ok(null));
+                });
+            });
+        });
+        const anySignalReceivedPromise: Promise<Result<null, Error>> = Promise.race(signalReceivedPromises);
+
+        server.start()
+
+        await anySignalReceivedPromise;
+
+        const tryShutdownPromise: Promise<Result<null, Error>> = new Promise((resolve, _unusedReject) => {
+            server.tryShutdown(() => {
+                resolve(ok(null));
+            })
+        })
+        const timeoutPromise: Promise<Result<null, Error>> = new Promise((resolve, _unusedReject) => {
+            setTimeout(
+                () => {
+                    resolve(err(new Error("gRPC server failed to stop gracefully after waiting for " + GRPC_SERVER_STOP_GRACE_PERIOD_MILLIS + "ms")));
+                },
+                GRPC_SERVER_STOP_GRACE_PERIOD_MILLIS
+            );
+        })
+        const gracefulShutdownResult: Result<null, Error> = await Promise.race([tryShutdownPromise, timeoutPromise])
+        if (gracefulShutdownResult.isErr()) {
+            log.debug("gRPC server has exited gracefully");
+        } else {
+            log.warn("gRPC server failed to stop gracefully after " + GRPC_SERVER_STOP_GRACE_PERIOD_MILLIS + "ms; hard-stopping now...");
+            server.forceShutdown();
+            log.debug("gRPC server was forcefully stopped")
+        }
 
         return ok(null);
     }
