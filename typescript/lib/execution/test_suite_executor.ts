@@ -33,11 +33,11 @@ class TestSuiteExecutor {
     }
 
     public async run(): Promise<Result<null, Error>> { //TODO - return type
-      	// NOTE: This can be empty if the testsuite is in metadata-providing mode
+        // NOTE: This can be empty if the testsuite is in metadata-providing mode
         const kurtosisApiSocketStr: string = process.env[KurtosisTestsuiteDockerEnvVar.KurtosisApiSocket];
 
         if (!(KurtosisTestsuiteDockerEnvVar.LogLevel in process.env)) {
-            return err(new Error("Expected an '" + KurtosisTestsuiteDockerEnvVar.LogLevel + "' environment variable containing the log level string that the testsuite should log at, but none was found"))
+            return err(new Error("Expected an '" + KurtosisTestsuiteDockerEnvVar.LogLevel + "' environment variable containing the log level string that the testsuite should log at, but none was found"));
         }
         const logLevelStr: string = process.env[KurtosisTestsuiteDockerEnvVar.LogLevel];
         if (logLevelStr == "") {
@@ -66,7 +66,7 @@ class TestSuiteExecutor {
 
         let testsuiteService: ITestSuiteServiceService;
         if (kurtosisApiSocketStr === "") {
-            testsuiteService = new MetadataProvidingTestsuiteService(suite)
+            testsuiteService = new MetadataProvidingTestsuiteService(suite);
         } else {
 
             // TODO SECURITY: Use HTTPS to ensure we're connecting to the real Kurtosis API servers
@@ -84,7 +84,7 @@ class TestSuiteExecutor {
         }
 
         // TODO Extract this to minimal-grpc-server
-        const server = new grpc.Server();
+        const server: grpc.Server = new grpc.Server();
         server.addService(TestSuiteServiceService, testsuiteService);
         const listenUrl: string = ":" + LISTEN_PORT;
         const boundPort: number = server.bind(listenUrl, grpc.credentials.createInsecure());
@@ -92,7 +92,7 @@ class TestSuiteExecutor {
             return err(new Error("An error occurred binding the server to listen URL '"+ boundPort +"'"));
         }
 
-        const signalsToHandle: Array<string> = [INTERRUPT_SIGNAL, QUIT_SIGNAL, TERM_SIGNAL]
+        const signalsToHandle: Array<string> = [INTERRUPT_SIGNAL, QUIT_SIGNAL, TERM_SIGNAL];
         const signalReceivedPromises: Array<Promise<Result<null, Error>>> = signalsToHandle.map((signal) => {
             return new Promise((resolve, _unusedReject) => {
                 process.on(signal, () => {
@@ -102,7 +102,7 @@ class TestSuiteExecutor {
         });
         const anySignalReceivedPromise: Promise<Result<null, Error>> = Promise.race(signalReceivedPromises);
 
-        server.start()
+        server.start();
 
         await anySignalReceivedPromise;
 
@@ -119,13 +119,13 @@ class TestSuiteExecutor {
                 GRPC_SERVER_STOP_GRACE_PERIOD_MILLIS
             );
         })
-        const gracefulShutdownResult: Result<null, Error> = await Promise.race([tryShutdownPromise, timeoutPromise])
+        const gracefulShutdownResult: Result<null, Error> = await Promise.race([tryShutdownPromise, timeoutPromise]);
         if (gracefulShutdownResult.isErr()) {
             log.debug("gRPC server has exited gracefully");
         } else {
             log.warn("gRPC server failed to stop gracefully after " + GRPC_SERVER_STOP_GRACE_PERIOD_MILLIS + "ms; hard-stopping now...");
             server.forceShutdown();
-            log.debug("gRPC server was forcefully stopped")
+            log.debug("gRPC server was forcefully stopped");
         }
 
         return ok(null);
