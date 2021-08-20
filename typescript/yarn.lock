@@ -581,7 +581,7 @@ json5@^2.2.0:
   dependencies:
     minimist "^1.2.5"
 
-kurtosis-core-api-lib@^0.12.2:
+kurtosis-core-api-lib@^0.12.3:
   version "0.12.3"
   resolved "https://registry.yarnpkg.com/kurtosis-core-api-lib/-/kurtosis-core-api-lib-0.12.3.tgz#8e1c905913e8cc9cb4781f5511f7a32c9cda07e2"
   integrity sha512-c2JSPODxFpg4b19Y2tNppWd/wQVESde7ug59+BahadxPpfLTnZe8CdnLS40IglW6KCUtNhILmspcFc4c1Od0wA==
