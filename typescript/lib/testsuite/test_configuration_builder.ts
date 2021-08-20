@@ -22,34 +22,34 @@ export class TestConfigurationBuilder {
         this.staticFileFilepaths = new Map();
         this.filesArtifactUrls = new Map();
     }
-
+    
     public withSetupTimeoutSeconds(setupTimeoutSeconds: number): TestConfigurationBuilder {
         this.setupTimeoutSeconds = setupTimeoutSeconds
         return this;
     }
-
+    
     public withRunTimeoutSeconds(runTimeoutSeconds: number): TestConfigurationBuilder {
         this.runTimeoutSeconds = runTimeoutSeconds;
         return this;
     }
-
+    
     public withPartitioningEnabled(isPartitioningEnabled: boolean): TestConfigurationBuilder {
         this.isPartioningEnabled = isPartitioningEnabled;
         return this;
     }
-
+    
     public withStaticFileFilepaths(staticFileFilepaths: Map<StaticFileID, string>): TestConfigurationBuilder {
         // TODO defensive copy
         this.staticFileFilepaths = staticFileFilepaths
         return this;
     }
-
+    
     public withFilesArtifactUrls(filesArtifactUrls: Map<FilesArtifactID, string>): TestConfigurationBuilder {
         // TODO defensive copy
         this.filesArtifactUrls = filesArtifactUrls;
         return this;
     }
-
+    
     public build(): TestConfiguration {
         return new TestConfiguration(
 			this.setupTimeoutSeconds, 
