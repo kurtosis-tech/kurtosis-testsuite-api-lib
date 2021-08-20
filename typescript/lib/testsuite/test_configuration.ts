@@ -3,7 +3,7 @@
  * All Rights Reserved.
  */
 
-//import { StaticFileID, FilesArtifactID } from "kurtosis-js-lib" //TODO TODO TODO - once kurt-client npm package is published
+import { StaticFileID, FilesArtifactID } from "kurtosis-core-api-lib"
 
 // TODO Make these fields private, with getters -> TODO TODO TODO (Ali addressed this)
 // Docs available at https://docs.kurtosistech.com/kurtosis-testsuite-api-lib/lib-documentation
@@ -18,17 +18,17 @@ export class TestConfiguration {
 	private readonly isPartitioningEnabled: boolean;
 
 	// Docs available at https://docs.kurtosistech.com/kurtosis-testsuite-api-lib/lib-documentation
-	private readonly staticFileFilepaths: Map<services.StaticFileID, string>;
+	private readonly staticFileFilepaths: Map<StaticFileID, string>;
 
 	// Docs available at https://docs.kurtosistech.com/kurtosis-testsuite-api-lib/lib-documentation
-	private readonly filesArtifactUrls: Map<services.FilesArtifactID, string>;
+	private readonly filesArtifactUrls: Map<FilesArtifactID, string>;
 
     constructor(
             setupTimeoutSeconds: number, 
             runTimeoutSeconds: number, 
             isPartitioningEnabled: boolean, 
-            staticFileFilepaths: Map<services.StaticFileID, string>,
-            filesArtifactUrls: Map<services.FilesArtifactID, string>) {
+            staticFileFilepaths: Map<StaticFileID, string>,
+            filesArtifactUrls: Map<FilesArtifactID, string>) {
         this.setupTimeoutSeconds = setupTimeoutSeconds;
         this.runTimeoutSeconds = runTimeoutSeconds;
         this.isPartitioningEnabled = isPartitioningEnabled;
@@ -48,11 +48,11 @@ export class TestConfiguration {
         return this.isPartitioningEnabled;
     }
 
-    public getStaticFileFilepaths(): Map<services.StaticFileID, string> {
+    public getStaticFileFilepaths(): Map<StaticFileID, string> {
         return this.staticFileFilepaths;
     }
 
-    public getFilesArtifactUrls(): Map<services.StaticFileID, string> {
+    public getFilesArtifactUrls(): Map<StaticFileID, string> {
         return this.filesArtifactUrls;
     }
 }

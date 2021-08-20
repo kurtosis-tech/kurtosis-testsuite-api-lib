@@ -1,4 +1,4 @@
-//import { StaticFileID, FilesArtifactID } from "kurtosis-js-lib" // TODO TODO TODO - once kurt-client npm package is published
+import { StaticFileID, FilesArtifactID } from "kurtosis-core-api-lib" // TODO TODO TODO - once kurt-client npm package is published
 import { TestConfiguration } from "./test_configuration";
 
 // vvvvvvvvv Update the docs if you change these vvvvvvvvvvv
@@ -12,8 +12,8 @@ export class TestConfigurationBuilder {
 	private setupTimeoutSeconds: number;
 	private runTimeoutSeconds: number;
 	private isPartioningEnabled: boolean;
-	private staticFileFilepaths: Map<services.StaticFileID, string>;
-	private filesArtifactUrls: Map<services.FilesArtifactID, string>;
+	private staticFileFilepaths: Map<StaticFileID, string>;
+	private filesArtifactUrls: Map<FilesArtifactID, string>;
 
 
     constructor () {
@@ -39,13 +39,13 @@ export class TestConfigurationBuilder {
         return this;
     }
 
-    public withStaticFileFilepaths(staticFileFilepaths: Map<services.StaticFileID, string>): TestConfigurationBuilder {
+    public withStaticFileFilepaths(staticFileFilepaths: Map<StaticFileID, string>): TestConfigurationBuilder {
         // TODO defensive copy
         this.staticFileFilepaths = staticFileFilepaths
         return this;
     }
 
-    public withFilesArtifactUrls(filesArtifactUrls: Map<services.FilesArtifactID, string>): TestConfigurationBuilder {
+    public withFilesArtifactUrls(filesArtifactUrls: Map<FilesArtifactID, string>): TestConfigurationBuilder {
         // TODO defensive copy
         this.filesArtifactUrls = filesArtifactUrls;
         return this;

@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "kurtosis-core-api-lib": "^0.12.2",
     "neverthrow": "^4.2.2"
   }
 }
