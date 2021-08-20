@@ -5,6 +5,7 @@
 * Added `lib/execution` files to typescript
 * Added a Typescript minimal gRPC server inside Typescript `TestsuiteExecutor`, which should be moved to the `minimal-grpc-server` library
 * Added a .gitignore file which doesn't add `node_modules` or `build` directories
+* Configured CircleCI checks & publishing for Typescript library
 
 ### Fixes
 * Replaced references to "Kurtosis Lib" in the changelog with "testsuite API lib"
