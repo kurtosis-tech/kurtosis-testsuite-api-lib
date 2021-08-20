@@ -1,2 +1,2 @@
-const LISTEN_PROTOCOL = "tcp";
-const LISTEN_PORT = 7718;
+export const LISTEN_PROTOCOL = "tcp";
+export const LISTEN_PORT = 7718;
