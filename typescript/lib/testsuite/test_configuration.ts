@@ -3,9 +3,8 @@
  * All Rights Reserved.
  */
 
-import { StaticFileID, FilesArtifactID } from "kurtosis-core-api-lib"
+import { StaticFileID, FilesArtifactID } from "kurtosis-core-api-lib";
 
-// TODO Make these fields private, with getters -> TODO TODO TODO (Ali addressed this)
 // Docs available at https://docs.kurtosistech.com/kurtosis-testsuite-api-lib/lib-documentation
 export class TestConfiguration {
 	// Docs available at https://docs.kurtosistech.com/kurtosis-testsuite-api-lib/lib-documentation
