@@ -5,7 +5,7 @@ import { TestSuiteConfigurator } from "./test_suite_configurator";
 import { MetadataProvidingTestsuiteService } from "./metadata_providing_testsuite_service";
 import { TestSuite } from "../testsuite/test_suite"; //TODO
 import { KurtosisTestsuiteDockerEnvVar, ENCLAVE_DATA_VOLUME_MOUNTPOINT } from "../../kurtosis_testsuite_docker_api/kurtosis_testsuite_docker_api";
-import { LISTEN_PORT, LISTEN_PROTOCOL } from "../../kurtosis_testsuite_rpc_api_consts/kurtosis_testsuite_rpc_api_consts";
+import { LISTEN_PORT } from "../../kurtosis_testsuite_rpc_api_consts/kurtosis_testsuite_rpc_api_consts";
 //"github.com/kurtosis-tech/minimal-grpc-server/server" //TODO
 import { Result, err, ok } from "neverthrow";
 import * as grpc from "grpc";
@@ -14,7 +14,6 @@ import * as log from "loglevel";
 //TODO Below
 //import { process } from "node"; //TODO - don't need line but need the dependency = npm i --save-dev @types/node for EnvVar
 import * as dotenv from 'dotenv'; //"os" //TODO
-import { promisify } from "util";
 //import * as time from "date-and-time"; //npm i --save-dev @types/date-and-time
 //import * as date from "date-fns"; //npm install date-fns --save
 
@@ -38,7 +37,7 @@ class TestSuiteExecutor {
         const kurtosisApiSocketStr: string = process.env[KurtosisTestsuiteDockerEnvVar.KurtosisApiSocket];
 
         if (!(KurtosisTestsuiteDockerEnvVar.LogLevel in process.env)) {
-            // TODO return error
+            return err(new Error("Expected an '" + KurtosisTestsuiteDockerEnvVar.LogLevel + "' environment variable containing the log level string that the testsuite should log at, but none was found"))
         }
         const logLevelStr: string = process.env[KurtosisTestsuiteDockerEnvVar.LogLevel];
         if (logLevelStr == "") {
