@@ -13,6 +13,7 @@
 
 ### Fixes
 * Replaced references to "Kurtosis Lib" in the changelog with "testsuite API lib"
+* Fixed `regenerate-protobuf-bindings` script that got broken when reshuffling Typescript directory hierarchy
 
 # 0.4.0
 ### Removed
