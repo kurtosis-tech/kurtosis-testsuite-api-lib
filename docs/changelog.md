@@ -1,6 +1,7 @@
 # TBD
 ### Changes
 * Added Apache-2 licensing
+* Switched to using the Kurtosis docs-checker orb rather than a custom docs-checking job
 
 ### Fixes
 * Replaced references to "Kurtosis Lib" in the changelog with "testsuite API lib"
