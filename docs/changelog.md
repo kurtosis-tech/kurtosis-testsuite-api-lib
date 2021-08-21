@@ -1,6 +1,7 @@
 # TBD
 ### Changes
 * Added Apache-2 licensing
+* Use correct `minimal-grpc-server` module
 
 ### Fixes
 * Replaced references to "Kurtosis Lib" in the changelog with "testsuite API lib"
