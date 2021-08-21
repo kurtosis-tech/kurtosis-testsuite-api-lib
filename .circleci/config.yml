@@ -52,12 +52,6 @@ workflows:
               ignore:
                 - develop
                 - master
-      - check_docs:
-          filters:
-            branches:
-              ignore:
-                - develop
-                - master
       # -- End PR check jobs ---------------------------------------
 
       # -- Artifact-publishing jobs --------------------------------
