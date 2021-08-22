@@ -1,36 +1,37 @@
-import { ITestSuiteServiceServer } from "../../kurtosis_testsuite_rpc_api_bindings/testsuite_service_grpc_pb";
+import { ITestSuiteServiceServer } from "../../kurtosis_testsuite_rpc_api_bindings/testsuite_service_grpc_pb"; //TODO (Ali) - make sure right interface
 import { TestMetadata, TestSuiteMetadata, RegisterFilesArgs, SetupTestArgs, RunTestArgs } from "../../kurtosis_testsuite_rpc_api_bindings/testsuite_service_pb";
-import { TestConfigurationBuilder } from "../testsuite/test_configuration_builder"; //TODO
-import { TestConfiguration } from "../testsuite/test_configuration"; //TODO
-import { TestSuite } from "../testsuite/test_suite"; //TODO
+import { TestConfigurationBuilder } from "../testsuite/test_configuration_builder";
+import { TestConfiguration } from "../testsuite/test_configuration";
+import { TestSuite } from "../testsuite/test_suite";
 import { newTestMetadata } from "../constructor_calls";
 import { ok, err, Result } from "neverthrow";
-import * as google_protobuf_empty_pb from "google-protobuf/google/protobuf/empty_pb";
-import * as grpc from "grpc";
+import * as google_protobuf_empty_pb from "google-protobuf/google/protobuf/empty_pb"; //TODO (Ali)
+import * as grpc from "grpc"; //TODO (Ali)
 
-// Service handlign endpoints when the testsuite is in metadata-providing mode - i.e. NOT running a testnet, without a connection to an API container
-export class MetadataProvidingTestsuiteService implements ITestSuiteServiceServer { //TODO - right server to implement?
+// Service handling endpoints when the testsuite is in metadata-providing mode - i.e. NOT running a testnet, without a connection to an API container
+export class MetadataProvidingTestsuiteService implements ITestSuiteServiceServer { //TODO (Ali) - methods on this interface are odd
 	private readonly suite: TestSuite;
+	
+	readonly [name: string]: any; //TODO TODO TODO (Ali) Solves the compiling issues but BIG maybe here
 
 	constructor(suite: TestSuite) {
-		this.suite = TestSuite;
+		this.suite = suite;
 	}
 
-	//TODO type signature of this method in grpc bindings => isAvailable: grpc.handleUnaryCall<google_protobuf_empty_pb.Empty, google_protobuf_empty_pb.Empty>;
-	public isAvailable(): Result<grpc.handleUnaryCall<google_protobuf_empty_pb.Empty, google_protobuf_empty_pb.Empty>, Error> { //TODO - should I be using Result; how do I go about writing this method signature?
+	public isAvailable(): Result<null, Error> { //TODO (Ali)
 		return ok(null);
 	}
 
-	public getTestSuiteMetadata(): Result<TestSuiteMetadata, Error> { //TODO - fix method signature
+	public getTestSuiteMetadata(): Result<TestSuiteMetadata, Error> { //TODO (Ali)
 		const allTestMetadata: Map<string, TestSuiteMetadata> = new Map();
 		for (let [testName, test] of this.suite.getTests().entries()) {
 			const testConfigBuilder: TestConfigurationBuilder = new TestConfigurationBuilder();
 			test.configure(testConfigBuilder);
 			const testConfig: TestConfiguration = testConfigBuilder.build();
 			const testMetadata: TestMetadata = newTestMetadata(
-				testConfig.isPartitioningEnabled, 
-				testConfig.setupTimeoutSeconds, 
-				testConfig.runTimeoutSeconds);
+				testConfig.getIsPartitioningEnabled(), 
+				testConfig.getSetupTimeoutSeconds(), 
+				testConfig.getRunTimeoutSeconds());
 	
 			allTestMetadata[testName] = testMetadata;
 		}
@@ -43,15 +44,15 @@ export class MetadataProvidingTestsuiteService implements ITestSuiteServiceServe
 		return ok(testSuiteMetadata); //TODO - can there never be an error case?
 	}
 
-	public registerFiles(args: RegisterFilesArgs): Result<null, Error> { //TODO - fix method signature
+	public registerFiles(): Result<RegisterFilesArgs, Error> { //TODO (Ali)
 		return err(new Error("Received a register files call while the testsuite service is in metadata-providing mode; this is a bug in Kurtosis"));
 	}
 
-	public setupTest(args: SetupTestArgs): Result<null, Error> { //TODO - fix method signature
+	public setupTest(): Result<SetupTestArgs, Error> { //TODO (Ali)
 		return err(new Error("Received a setup test call while the testsuite service is in metadata-providing mode; this is a bug in Kurtosis"));
 	}
 
-	public runTest(args: RunTestArgs): Result<null, Error> { //TODO - fix method signature
+	public runTest(): Result<RunTestArgs, Error> { //TODO (Ali)
 		return err(new Error("Received a run test call while the testsuite service is in metadata-providing mode; this is a bug in Kurtosis"));
 	}
 }

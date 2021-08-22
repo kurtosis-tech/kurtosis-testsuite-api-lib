@@ -6,7 +6,7 @@
 import { Test } from "./test";
 
 // Docs available at https://docs.kurtosistech.com/kurtosis-testsuite-api-lib/lib-documentation
-interface TestSuite {
+export interface TestSuite {
 	// Docs available at https://docs.kurtosistech.com/kurtosis-testsuite-api-lib/lib-documentation
 	getTests(): Map<string, Test>;
 }
