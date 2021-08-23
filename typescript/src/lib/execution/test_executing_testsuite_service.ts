@@ -14,7 +14,7 @@ import * as grpc from "grpc"; //TODO (Ali)
 // Service for handling endpoints when the testsuite is in test-executing mode - i.e., inside a testsnet and running a single test
 export class TestExecutingTestsuiteService implements ITestSuiteServiceServer{ //TODO - right interface?
 	
-    readonly [name: string]: any; //TODO TODO TODO (Ali) Solves the compiling issues but BIG maybe here
+    readonly [name: string]: any; //TODO TODO TODO (Ali) Solves the compiling issues but very ugly and loses purpose of using interface
     
     private readonly suite: TestSuite;
 

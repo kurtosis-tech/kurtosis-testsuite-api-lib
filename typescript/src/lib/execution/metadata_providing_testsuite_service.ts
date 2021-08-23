@@ -12,7 +12,7 @@ import * as grpc from "grpc"; //TODO (Ali)
 export class MetadataProvidingTestsuiteService implements ITestSuiteServiceServer { //TODO (Ali) - methods on this interface are odd
 	private readonly suite: TestSuite;
 	
-	readonly [name: string]: any; //TODO TODO TODO (Ali) Solves the compiling issues but BIG maybe here
+	readonly [name: string]: any; //TODO TODO TODO (Ali) Solves the compiling issues but very ugly and loses purpose of using interface
 
 	constructor(suite: TestSuite) {
 		this.suite = suite;
