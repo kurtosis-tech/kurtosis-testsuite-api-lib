@@ -18,7 +18,7 @@ const INTERRUPT_SIGNAL: string = "SIGNINT"
 const QUIT_SIGNAL: string = "SIGQUIT"
 const TERM_SIGNAL: string = "SIGTERM"
 
-class TestSuiteExecutor {
+export class TestSuiteExecutor {
 	private readonly configurator: TestSuiteConfigurator;
 
 
