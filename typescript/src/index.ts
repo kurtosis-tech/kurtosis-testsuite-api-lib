@@ -8,6 +8,7 @@ import { MetadataProvidingTestsuiteService } from "./lib/execution/metadata_prov
 import { TestExecutingTestsuiteService } from "./lib/execution/test_executing_testsuite_service";
 import { TestSuiteConfigurator } from "./lib/execution/test_suite_configurator";
 import { TestSuiteExecutor } from "./lib/execution/test_suite_executor";
+import { KnownKeys, KnownKeysOnly } from "./lib/execution/unimplemented_server_requirements";
 import { newTestMetadata } from "./lib/constructor_calls";
 //import typescript bindings
 
@@ -24,6 +25,7 @@ export { TestSuite };
 export { Test };
 
 //Execution Files
+export { KnownKeys, KnownKeysOnly }
 export { MetadataProvidingTestsuiteService };
 export { TestExecutingTestsuiteService };
 export { TestSuiteConfigurator };

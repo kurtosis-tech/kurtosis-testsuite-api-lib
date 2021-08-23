@@ -1,4 +1,4 @@
-import { TestSuiteServiceService, ITestSuiteServiceService, ITestSuiteServiceServer } from "../../kurtosis_testsuite_rpc_api_bindings/testsuite_service_grpc_pb"; //TODO (Ali) - make sure using right Services
+import { TestSuiteServiceService, ITestSuiteServiceServer } from "../../kurtosis_testsuite_rpc_api_bindings/testsuite_service_grpc_pb";
 import { NetworkContext, ApiContainerServiceClient } from "kurtosis-core-api-lib";
 import { TestExecutingTestsuiteService } from "./test_executing_testsuite_service";
 import { TestSuiteConfigurator } from "./test_suite_configurator";
@@ -10,6 +10,7 @@ import { Result, err, ok } from "neverthrow";
 import * as grpc from "grpc";
 import * as log from "loglevel";
 import * as dotenv from 'dotenv';
+import { KnownKeysOnly } from "./unimplemented_server_requirements";
 
 dotenv.config();
 
@@ -57,7 +58,7 @@ export class TestSuiteExecutor {
         }
         const suite: TestSuite = parseParamsAndCreateSuiteResult.value;
 
-        let testsuiteService: ITestSuiteServiceServer; //TODO (Ali)
+        let testsuiteService: KnownKeysOnly<ITestSuiteServiceServer>;
         let apiContainerClient: ApiContainerServiceClient;
 
         try {
@@ -67,7 +68,7 @@ export class TestSuiteExecutor {
 
                 // TODO SECURITY: Use HTTPS to ensure we're connecting to the real Kurtosis API servers             
                 try {
-                    apiContainerClient = new ApiContainerServiceClient(kurtosisApiSocketStr, grpc.credentials.createInsecure()); //TODO (Ali) (comment) - ApiContainerServiceClient extends grpc.Client
+                    apiContainerClient = new ApiContainerServiceClient(kurtosisApiSocketStr, grpc.credentials.createInsecure());
                 }
                 catch(clientErr) {
                     return err(clientErr);

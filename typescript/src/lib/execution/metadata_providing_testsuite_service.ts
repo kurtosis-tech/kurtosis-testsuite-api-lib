@@ -1,29 +1,28 @@
-import { ITestSuiteServiceServer } from "../../kurtosis_testsuite_rpc_api_bindings/testsuite_service_grpc_pb"; //TODO (Ali) - make sure right interface
+import { ITestSuiteServiceServer } from "../../kurtosis_testsuite_rpc_api_bindings/testsuite_service_grpc_pb";
 import { TestMetadata, TestSuiteMetadata, RegisterFilesArgs, SetupTestArgs, RunTestArgs } from "../../kurtosis_testsuite_rpc_api_bindings/testsuite_service_pb";
 import { TestConfigurationBuilder } from "../testsuite/test_configuration_builder";
 import { TestConfiguration } from "../testsuite/test_configuration";
 import { TestSuite } from "../testsuite/test_suite";
 import { newTestMetadata } from "../constructor_calls";
-import { ok, err, Result } from "neverthrow";
-import * as google_protobuf_empty_pb from "google-protobuf/google/protobuf/empty_pb"; //TODO (Ali)
-import * as grpc from "grpc"; //TODO (Ali)
+import * as google_protobuf_empty_pb from "google-protobuf/google/protobuf/empty_pb";
+import * as grpc from "grpc";
+import * as jspb from "google-protobuf";
+import { KnownKeysOnly } from "./unimplemented_server_requirements";
 
 // Service handling endpoints when the testsuite is in metadata-providing mode - i.e. NOT running a testnet, without a connection to an API container
-export class MetadataProvidingTestsuiteService implements ITestSuiteServiceServer { //TODO (Ali) - methods on this interface are odd
+export class MetadataProvidingTestsuiteService implements KnownKeysOnly<ITestSuiteServiceServer> {
 	private readonly suite: TestSuite;
-	
-	readonly [name: string]: any; //TODO TODO TODO (Ali) Solves the compiling issues but very ugly and loses purpose of using interface
 
 	constructor(suite: TestSuite) {
 		this.suite = suite;
 	}
 
-	public isAvailable(): Result<null, Error> { //TODO (Ali)
-		return ok(null);
+	public isAvailable(call: grpc.ServerUnaryCall<null>, callback: grpc.sendUnaryData<google_protobuf_empty_pb.Empty>): void {
+		callback(null, null);
 	}
 
-	public getTestSuiteMetadata(): Result<TestSuiteMetadata, Error> { //TODO (Ali)
-		const allTestMetadata: Map<string, TestSuiteMetadata> = new Map();
+	public getTestSuiteMetadata(call: grpc.ServerUnaryCall<google_protobuf_empty_pb.Empty>, callback: grpc.sendUnaryData<TestSuiteMetadata>): void {
+		const allTestMetadata: Map<string, TestMetadata> = new Map();
 		for (let [testName, test] of this.suite.getTests().entries()) {
 			const testConfigBuilder: TestConfigurationBuilder = new TestConfigurationBuilder();
 			test.configure(testConfigBuilder);
@@ -37,22 +36,22 @@ export class MetadataProvidingTestsuiteService implements ITestSuiteServiceServe
 		}
 
 		const testSuiteMetadata: TestSuiteMetadata = new TestSuiteMetadata();
-		const testSuiteMetadataMap: Map<string, TestSuiteMetadata> = testSuiteMetadata.getTestMetadataMap();
+		const testSuiteMetadataMap: jspb.Map<string, TestMetadata> = testSuiteMetadata.getTestMetadataMap();
 		for (let [allTestMetadataId, allTestMetadataTestSuite] of allTestMetadata.entries()) {
 			testSuiteMetadataMap.set(allTestMetadataId, allTestMetadataTestSuite);
 		}
-		return ok(testSuiteMetadata); //TODO - can there never be an error case?
+		return callback(null, testSuiteMetadata);
 	}
 
-	public registerFiles(): Result<RegisterFilesArgs, Error> { //TODO (Ali)
-		return err(new Error("Received a register files call while the testsuite service is in metadata-providing mode; this is a bug in Kurtosis"));
+	public registerFiles(call: grpc.ServerUnaryCall<RegisterFilesArgs>, callback: grpc.sendUnaryData<google_protobuf_empty_pb.Empty>): void {
+		callback(new Error("Received a register files call while the testsuite service is in metadata-providing mode; this is a bug in Kurtosis"), null);
 	}
 
-	public setupTest(): Result<SetupTestArgs, Error> { //TODO (Ali)
-		return err(new Error("Received a setup test call while the testsuite service is in metadata-providing mode; this is a bug in Kurtosis"));
+	public setupTest(call: grpc.ServerUnaryCall<SetupTestArgs>, callback: grpc.sendUnaryData<google_protobuf_empty_pb.Empty>): void {
+		callback(new Error("Received a setup test call while the testsuite service is in metadata-providing mode; this is a bug in Kurtosis"), null);
 	}
 
-	public runTest(): Result<RunTestArgs, Error> { //TODO (Ali)
-		return err(new Error("Received a run test call while the testsuite service is in metadata-providing mode; this is a bug in Kurtosis"));
+	public runTest(call: grpc.ServerUnaryCall<RunTestArgs>, callback: grpc.sendUnaryData<google_protobuf_empty_pb.Empty>): void{
+		callback(new Error("Received a run test call while the testsuite service is in metadata-providing mode; this is a bug in Kurtosis"), null);
 	}
 }
