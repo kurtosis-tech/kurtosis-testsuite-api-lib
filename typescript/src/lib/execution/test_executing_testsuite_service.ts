@@ -11,6 +11,7 @@ import * as google_protobuf_empty_pb from "google-protobuf/google/protobuf/empty
 import * as grpc from "grpc";
 import { KnownKeysOnly } from "minimal-grpc-server";
 import { KurtosisTestsuiteApiLibServiceError } from "./serviceError"; //TODO - Following DRY and I think this repo specific at the moment so I can't import from anywhere
+import { Result, ok, err } from "neverthrow";
 
 // Service for handling endpoints when the testsuite is in test-executing mode - i.e., inside a testsnet and running a single test
 export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteServiceServer>{
@@ -37,11 +38,11 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
     }
 
     public getTestSuiteMetadata(call: grpc.ServerUnaryCall<google_protobuf_empty_pb.Empty>, callback: grpc.sendUnaryData<TestSuiteMetadata>): void {
-        callback(
-			new KurtosisTestsuiteApiLibServiceError(
-				grpc.status.INTERNAL, 
-				new Error("Received a get suite metadata call while the testsuite service is in test-executing mode; " + "this is a bug in Kurtosis")),
-			null);
+        const serviceError: KurtosisTestsuiteApiLibServiceError = new KurtosisTestsuiteApiLibServiceError(
+			grpc.status.INTERNAL, 
+			new Error("Received a get suite metadata call while the testsuite service is in test-executing mode; " + "this is a bug in Kurtosis")
+		);
+		callback(serviceError, null);
     }
 
     public registerFiles(call: grpc.ServerUnaryCall<RegisterFilesArgs>, callback: grpc.sendUnaryData<google_protobuf_empty_pb.Empty>): void {
@@ -49,12 +50,11 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
         const testName: string = args.getTestName();
         const allTests: Map<string, Test> = this.suite.getTests();
         if (!allTests.has(testName)) { //Note - making assumption that if key existing in Map, then value should be there too
-            callback(
-				new KurtosisTestsuiteApiLibServiceError(
-					grpc.status.INTERNAL,
-					new Error("No test '" + testName + "' found in the testsuite")),
-				null);
-            return;
+			const serviceError: KurtosisTestsuiteApiLibServiceError = new KurtosisTestsuiteApiLibServiceError(
+				grpc.status.INTERNAL,
+				new Error("No test '" + testName + "' found in the testsuite")
+			);
+            callback(serviceError, null);
         }
         const test: Test = allTests[testName];
 
@@ -64,21 +64,21 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
 
         this.networkCtx.registerStaticFiles(testConfig.getStaticFileFilepaths()).then(registerStaticFilesResponse => { //TODO - format
 			if (!registerStaticFilesResponse.isOk()) {
-				callback(
-					new KurtosisTestsuiteApiLibServiceError(
-						grpc.status.INTERNAL,
-						registerStaticFilesResponse.error),
-					null);
+				const serviceError: KurtosisTestsuiteApiLibServiceError = new KurtosisTestsuiteApiLibServiceError(
+					grpc.status.INTERNAL,
+					registerStaticFilesResponse.error
+				);
+				callback(serviceError, null);
 				return;
 			}
 
 			this.networkCtx.registerFilesArtifacts(testConfig.getFilesArtifactUrls()).then(registerFilesArtifactsResponse => { //TODO - format
 				if (!registerFilesArtifactsResponse.isOk()) {
-					callback(
-						new KurtosisTestsuiteApiLibServiceError(
-							grpc.status.INTERNAL,
-							registerFilesArtifactsResponse.error),
-						null);
+					const serviceError: KurtosisTestsuiteApiLibServiceError = new KurtosisTestsuiteApiLibServiceError(
+						grpc.status.INTERNAL,
+						registerFilesArtifactsResponse.error
+					);
+					callback(serviceError, null);
 					return;
 				}
 
@@ -91,107 +91,44 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
 
     public setupTest(call: grpc.ServerUnaryCall<SetupTestArgs>, callback: grpc.sendUnaryData<google_protobuf_empty_pb.Empty>): void {
         const args: SetupTestArgs = call.request;
-        this.postSetupNetworkMutex.acquire().then(release => {
-			try {
-				if (this.postSetupNetwork !== null) {
-					callback(
-						new KurtosisTestsuiteApiLibServiceError(
-							grpc.status.INTERNAL,
-							new Error("Cannot setup test; a test was already set up")),
-						null);
-					return;
-				}
+		const functionInsideMutex: () => Promise<Result<null, Error>> = () => {
+			return this.setupTestAsync(args);
+		}
 
-				const testName: string = args.getTestName();
-
-				const allTests: Map<string, Test> = this.suite.getTests();
-				if (!allTests.has(testName)) { //Note - making assumption that if key existing in Map, then value should be there too
-					callback(
-						new KurtosisTestsuiteApiLibServiceError(
-							grpc.status.INTERNAL,
-							new Error("Testsuite was directed to setup test '" + testName + "', but no test with that name exists " +
-							"in the testsuite; this is a Kurtosis code bug")),
-						null);
-					return;
-				}
-				const test: Test = allTests[testName];
-
-				log.info("Setting up network for test '" + testName + "'...");
-				
-				test.setup(this.networkCtx).then(userNetworkResult => {
-					if (!userNetworkResult.isOk()) {
-						callback(
-							new KurtosisTestsuiteApiLibServiceError(
-								grpc.status.INTERNAL,
-								userNetworkResult.error),
-							null);
-						return;
-					} 
-					if (userNetworkResult.value === null) {
-						callback(
-							new KurtosisTestsuiteApiLibServiceError(
-								grpc.status.INTERNAL,
-								new Error("The test setup method returned successfully, but yielded a nil network object - " +
-								"this is a bug with the test's setup method accidentally returning a nil network object")),
-							null);
-					}
-					this.postSetupNetwork = userNetworkResult.value;
-					log.info("Successfully set up test network for test '" + testName + "'");
-
-					callback(null, null);
-				})	
-			} finally {
-				release();
+        this.postSetupNetworkMutex.runExclusive(functionInsideMutex).then(setupTestResult => {
+			if (!setupTestResult.isOk()) {
+				const serviceError: KurtosisTestsuiteApiLibServiceError = new KurtosisTestsuiteApiLibServiceError(
+					grpc.status.INTERNAL,
+					setupTestResult.error
+				);
+				callback(serviceError, null);
+			} else {
+				callback(null, null);
 			}
+
 		})
     }
 
     public runTest(call: grpc.ServerUnaryCall<RunTestArgs>, callback: grpc.sendUnaryData<google_protobuf_empty_pb.Empty>): void {
         const args: RunTestArgs = call.request;
-        this.postSetupNetworkMutex.acquire().then(release => {
-			try {
-
-				if (this.postSetupNetwork === null) {
-					callback(
-						new KurtosisTestsuiteApiLibServiceError(
-							grpc.status.INTERNAL,
-							new Error("Received a request to run the test, but the test hasn't been set up yet")),
-						null);
-					return;
-				}
-
-				const testName: string = args.getTestName();
-
-				const allTests: Map<string, Test> = this.suite.getTests();
-				if (!allTests.has(testName)) {
-					callback(
-						new KurtosisTestsuiteApiLibServiceError(
-							grpc.status.INTERNAL,
-							new Error("Testsuite was directed to run test '" + testName + "', but no test with that name exists " +
-							"in the testsuite; this is a Kurtosis code bug")),
-						null);
-					return;
-				}
-				const test: Test = allTests[testName];
-	
-				log.info("Running test logic for test '" + testName + "'...");
-				this.runTestHelper(test,this.postSetupNetwork).then(runTestHelperErr => {
-					if (runTestHelperErr !== null) {
-						callback(
-							new KurtosisTestsuiteApiLibServiceError(
-								grpc.status.INTERNAL,
-								runTestHelperErr),
-							null);
-						return;
-					}
-					log.info("Ran test logic for test " + testName);
-					callback(null, null);
-				})
-			} finally {
-				release();
+		const functionInsideMutex: () => Promise<Result<null, Error>> = () => {
+			return this.runTestAsync(args);
+		}
+        this.postSetupNetworkMutex.runExclusive(functionInsideMutex).then(runTestResult => {
+			if (!runTestResult.isOk()) {
+				const serviceError: KurtosisTestsuiteApiLibServiceError = new KurtosisTestsuiteApiLibServiceError(
+					grpc.status.INTERNAL,
+					runTestResult.error
+				)
+				callback(serviceError, null);
+			} else {
+				callback(null, null);
 			}
 		})
     }
+
+
+	//HELPER METHODS
 
     // Little helper function that runs the test and captures panics on test failures, returning them as errors
     public runTestHelper(test: Test, untypedNetwork: any): Promise<Error> {
@@ -209,4 +146,59 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
                 log.trace("Caught panic while running test: " + exceptionErr);
         }
     }
+
+	public async setupTestAsync(args: SetupTestArgs): Promise<Result<null, Error>> {
+		if (this.postSetupNetwork !== null) {
+			return err(new Error("Cannot setup test; a test was already set up"));
+		}
+
+		const testName: string = args.getTestName();
+
+		const allTests: Map<string, Test> = this.suite.getTests();
+		if (!allTests.has(testName)) { //Note - making assumption that if key existing in Map, then value should be there too
+			return err(new Error("Testsuite was directed to setup test '" + testName + "', but no test with that name exists " +
+			"in the testsuite; this is a Kurtosis code bug"));
+		}
+		const test: Test = allTests[testName];
+
+		log.info("Setting up network for test '" + testName + "'...");
+		
+		const userNetworkResult: Result<Network, Error> = await test.setup(this.networkCtx);
+		if (!userNetworkResult.isOk()) {
+			return err(userNetworkResult.error);
+		} 
+		if (userNetworkResult.value === null) {
+			return err(new Error("The test setup method returned successfully, but yielded a nil network object - " +
+			"this is a bug with the test's setup method accidentally returning a nil network object"));
+		}
+		this.postSetupNetwork = userNetworkResult.value;
+		log.info("Successfully set up test network for test '" + testName + "'");
+
+		ok(null);
+	}
+
+	public async runTestAsync(args: RunTestArgs): Promise<Result<null, Error>> {
+
+		if (this.postSetupNetwork === null) {
+			return err(new Error("Received a request to run the test, but the test hasn't been set up yet"));
+		}
+
+		const testName: string = args.getTestName();
+
+		const allTests: Map<string, Test> = this.suite.getTests();
+		if (!allTests.has(testName)) {
+			return err(new Error("Testsuite was directed to run test '" + testName + "', but no test with that name exists " +
+			"in the testsuite; this is a Kurtosis code bug"));
+		}
+		const test: Test = allTests[testName];
+
+		log.info("Running test logic for test '" + testName + "'...");
+		this.runTestHelper(test,this.postSetupNetwork).then(runTestHelperErr => {
+			if (runTestHelperErr !== null) {
+				return err(runTestHelperErr);
+			}
+			log.info("Ran test logic for test " + testName);
+			return ok(null);
+		})
+	}
 }
