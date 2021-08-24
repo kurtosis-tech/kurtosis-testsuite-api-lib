@@ -45,26 +45,26 @@ export class MetadataProvidingTestsuiteService implements KnownKeysOnly<ITestSui
 	}
 
 	public registerFiles(call: grpc.ServerUnaryCall<RegisterFilesArgs>, callback: grpc.sendUnaryData<google_protobuf_empty_pb.Empty>): void {
-		callback(
-			new KurtosisTestsuiteApiLibServiceError(
-				grpc.status.INTERNAL,
-				new Error("Received a register files call while the testsuite service is in metadata-providing mode; this is a bug in Kurtosis")),
-			null);
+		const serviceError: KurtosisTestsuiteApiLibServiceError = new KurtosisTestsuiteApiLibServiceError(
+			grpc.status.INTERNAL,
+			new Error("Received a register files call while the testsuite service is in metadata-providing mode; this is a bug in Kurtosis")
+		);
+		callback(serviceError, null);
 	}
 
 	public setupTest(call: grpc.ServerUnaryCall<SetupTestArgs>, callback: grpc.sendUnaryData<google_protobuf_empty_pb.Empty>): void {
-		callback(
-			new KurtosisTestsuiteApiLibServiceError(
-				grpc.status.INTERNAL,
-				new Error("Received a setup test call while the testsuite service is in metadata-providing mode; this is a bug in Kurtosis")),
-			null);
+		const serviceError: KurtosisTestsuiteApiLibServiceError = new KurtosisTestsuiteApiLibServiceError(
+			grpc.status.INTERNAL,
+			new Error("Received a setup test call while the testsuite service is in metadata-providing mode; this is a bug in Kurtosis")
+		);
+		callback(serviceError, null);
 	}
 
 	public runTest(call: grpc.ServerUnaryCall<RunTestArgs>, callback: grpc.sendUnaryData<google_protobuf_empty_pb.Empty>): void{
-		callback(
-			new KurtosisTestsuiteApiLibServiceError(
-				grpc.status.INTERNAL,
-				new Error("Received a run test call while the testsuite service is in metadata-providing mode; this is a bug in Kurtosis")),
-			null);
+		const serviceError: KurtosisTestsuiteApiLibServiceError = new KurtosisTestsuiteApiLibServiceError(
+			grpc.status.INTERNAL,
+			new Error("Received a run test call while the testsuite service is in metadata-providing mode; this is a bug in Kurtosis")
+		);
+		callback(serviceError, null);
 	}
 }
