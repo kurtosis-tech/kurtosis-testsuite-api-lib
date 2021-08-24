@@ -96,7 +96,7 @@ class TestSuiteExecutor {
             serviceRegistrationFuncs
         );
 
-        const runServerResult = await grpcServer.run()
+        const runServerResult = await grpcServer.run();
         if (runServerResult.isErr()) {
             return err(runServerResult.error);
         }
