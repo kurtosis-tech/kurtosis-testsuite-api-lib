@@ -15,54 +15,54 @@ import { Result, ok, err } from "neverthrow";
 
 // Service for handling endpoints when the testsuite is in test-executing mode - i.e., inside a testsnet and running a single test
 export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteServiceServer>{
-	    
-    private readonly suite: TestSuite;
-    
-    // Will be nil until setup is called
-    private postSetupNetwork: Network;
-    
-    // Mutex to guard the postSetupNetwork object, so any accidental concurrent calls of SetupInfo don't generate race conditions
-    private readonly postSetupNetworkMutex: mutex.Mutex;
-    
-    private readonly networkCtx: NetworkContext;
-    
-    constructor(suite: TestSuite, networkCtx: NetworkContext) {
-        this.suite = suite;
-        this.postSetupNetwork = null;
-        this.postSetupNetworkMutex = new mutex.Mutex();
-        this.networkCtx = networkCtx;
-    }
+		
+	private readonly suite: TestSuite;
+	
+	// Will be nil until setup is called
+	private postSetupNetwork: Network;
+	
+	// Mutex to guard the postSetupNetwork object, so any accidental concurrent calls of SetupInfo don't generate race conditions
+	private readonly postSetupNetworkMutex: mutex.Mutex;
+	
+	private readonly networkCtx: NetworkContext;
+	
+	constructor(suite: TestSuite, networkCtx: NetworkContext) {
+		this.suite = suite;
+		this.postSetupNetwork = null;
+		this.postSetupNetworkMutex = new mutex.Mutex();
+		this.networkCtx = networkCtx;
+	}
 
-    public isAvailable(call: grpc.ServerUnaryCall<google_protobuf_empty_pb.Empty>, callback: grpc.sendUnaryData<google_protobuf_empty_pb.Empty>): void {
-        callback(null, null);
-    }
+	public isAvailable(call: grpc.ServerUnaryCall<google_protobuf_empty_pb.Empty>, callback: grpc.sendUnaryData<google_protobuf_empty_pb.Empty>): void {
+		callback(null, null);
+	}
 
-    public getTestSuiteMetadata(call: grpc.ServerUnaryCall<google_protobuf_empty_pb.Empty>, callback: grpc.sendUnaryData<TestSuiteMetadata>): void {
-        const serviceError: KurtosisTestsuiteApiLibServiceError = new KurtosisTestsuiteApiLibServiceError(
+	public getTestSuiteMetadata(call: grpc.ServerUnaryCall<google_protobuf_empty_pb.Empty>, callback: grpc.sendUnaryData<TestSuiteMetadata>): void {
+		const serviceError: KurtosisTestsuiteApiLibServiceError = new KurtosisTestsuiteApiLibServiceError(
 			grpc.status.INTERNAL, 
 			new Error("Received a get suite metadata call while the testsuite service is in test-executing mode; " + "this is a bug in Kurtosis")
 		);
 		callback(serviceError, null);
-    }
+	}
 
-    public registerFiles(call: grpc.ServerUnaryCall<RegisterFilesArgs>, callback: grpc.sendUnaryData<google_protobuf_empty_pb.Empty>): void {
-        const args: RegisterFilesArgs = call.request;
-        const testName: string = args.getTestName();
-        const allTests: Map<string, Test> = this.suite.getTests();
-        if (!allTests.has(testName)) { //Note - making assumption that if key existing in Map, then value should be there too
+	public registerFiles(call: grpc.ServerUnaryCall<RegisterFilesArgs>, callback: grpc.sendUnaryData<google_protobuf_empty_pb.Empty>): void {
+		const args: RegisterFilesArgs = call.request;
+		const testName: string = args.getTestName();
+		const allTests: Map<string, Test> = this.suite.getTests();
+		if (!allTests.has(testName)) { //Note - making assumption that if key existing in Map, then value should be there too
 			const serviceError: KurtosisTestsuiteApiLibServiceError = new KurtosisTestsuiteApiLibServiceError(
 				grpc.status.INTERNAL,
 				new Error("No test '" + testName + "' found in the testsuite")
 			);
 			callback(serviceError, null);
-        }
-        const test: Test = allTests[testName];
+		}
+		const test: Test = allTests[testName];
 
-        const testConfigBuilder: TestConfigurationBuilder = new TestConfigurationBuilder();
-        test.configure(testConfigBuilder);
-        const testConfig: TestConfiguration = testConfigBuilder.build();
+		const testConfigBuilder: TestConfigurationBuilder = new TestConfigurationBuilder();
+		test.configure(testConfigBuilder);
+		const testConfig: TestConfiguration = testConfigBuilder.build();
 
-        this.networkCtx.registerStaticFiles(testConfig.getStaticFileFilepaths()).then(registerStaticFilesResponse => { //TODO - format
+		this.networkCtx.registerStaticFiles(testConfig.getStaticFileFilepaths()).then(registerStaticFilesResponse => { //TODO - format
 			if (!registerStaticFilesResponse.isOk()) {
 				const serviceError: KurtosisTestsuiteApiLibServiceError = new KurtosisTestsuiteApiLibServiceError(
 					grpc.status.INTERNAL,
@@ -87,15 +87,15 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
 			})
 		})
 
-    }
+	}
 
-    public setupTest(call: grpc.ServerUnaryCall<SetupTestArgs>, callback: grpc.sendUnaryData<google_protobuf_empty_pb.Empty>): void {
-        const args: SetupTestArgs = call.request;
+	public setupTest(call: grpc.ServerUnaryCall<SetupTestArgs>, callback: grpc.sendUnaryData<google_protobuf_empty_pb.Empty>): void {
+		const args: SetupTestArgs = call.request;
 		const functionInsideMutex: () => Promise<Result<null, Error>> = () => {
 			return this.setupTestAsync(args);
 		}
 
-        this.postSetupNetworkMutex.runExclusive(functionInsideMutex).then(setupTestResult => {
+		this.postSetupNetworkMutex.runExclusive(functionInsideMutex).then(setupTestResult => {
 			if (!setupTestResult.isOk()) {
 				const serviceError: KurtosisTestsuiteApiLibServiceError = new KurtosisTestsuiteApiLibServiceError(
 					grpc.status.INTERNAL,
@@ -107,14 +107,14 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
 			}
 
 		})
-    }
+	}
 
-    public runTest(call: grpc.ServerUnaryCall<RunTestArgs>, callback: grpc.sendUnaryData<google_protobuf_empty_pb.Empty>): void {
-        const args: RunTestArgs = call.request;
+	public runTest(call: grpc.ServerUnaryCall<RunTestArgs>, callback: grpc.sendUnaryData<google_protobuf_empty_pb.Empty>): void {
+		const args: RunTestArgs = call.request;
 		const functionInsideMutex: () => Promise<Result<null, Error>> = () => {
 			return this.runTestAsync(args);
 		}
-        this.postSetupNetworkMutex.runExclusive(functionInsideMutex).then(runTestResult => {
+		this.postSetupNetworkMutex.runExclusive(functionInsideMutex).then(runTestResult => {
 			if (!runTestResult.isOk()) {
 				const serviceError: KurtosisTestsuiteApiLibServiceError = new KurtosisTestsuiteApiLibServiceError(
 					grpc.status.INTERNAL,
@@ -125,16 +125,16 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
 				callback(null, null);
 			}
 		})
-    }
+	}
 
 
 	//HELPER METHODS
 
-    // Little helper function that runs the test and captures panics on test failures, returning them as errors
-    public runTestHelper(test: Test, untypedNetwork: any): Promise<Error> {
-        // See https://medium.com/@hussachai/error-handling-in-go-a-quick-opinionated-guide-9199dd7c7f76 for details
-        try {
-            const resultErr: Promise<Error> = test.run(untypedNetwork).then(runErr => {
+	// Little helper function that runs the test and captures panics on test failures, returning them as errors
+	public runTestHelper(test: Test, untypedNetwork: any): Promise<Error> {
+		// See https://medium.com/@hussachai/error-handling-in-go-a-quick-opinionated-guide-9199dd7c7f76 for details
+		try {
+			const resultErr: Promise<Error> = test.run(untypedNetwork).then(runErr => {
 				if (runErr !== null) {
 					return runErr;
 				}
@@ -142,10 +142,10 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
 				return null;
 			})
 			return resultErr;
-        } catch(exceptionErr) {
-                log.trace("Caught panic while running test: " + exceptionErr);
-        }
-    }
+		} catch(exceptionErr) {
+				log.trace("Caught panic while running test: " + exceptionErr);
+		}
+	}
 
 	public async setupTestAsync(args: SetupTestArgs): Promise<Result<null, Error>> {
 		if (this.postSetupNetwork !== null) {
