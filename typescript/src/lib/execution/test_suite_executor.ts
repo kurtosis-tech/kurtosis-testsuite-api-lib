@@ -10,6 +10,7 @@ import { LISTEN_PORT } from "../../kurtosis_testsuite_rpc_api_consts/kurtosis_te
 import { Result, err, ok } from "neverthrow";
 import * as grpc from "grpc";
 import * as log from "loglevel";
+import { MinimalGRPCServer } from "minimal-grpc-server";
 
 //TODO Below
 //import { process } from "node"; //TODO - don't need line but need the dependency = npm i --save-dev @types/node for EnvVar
@@ -19,7 +20,7 @@ import * as dotenv from 'dotenv'; //"os" //TODO
 
 dotenv.config();
 
-const GRPC_SERVER_STOP_GRACE_PERIOD_MILLIS: number = 5000;
+const GRPC_SERVER_STOP_GRACE_PERIOD_SECONDS: number = 5;
 const INTERRUPT_SIGNAL: string = "SIGNINT"
 const QUIT_SIGNAL: string = "SIGQUIT"
 const TERM_SIGNAL: string = "SIGTERM"
@@ -83,49 +84,21 @@ class TestSuiteExecutor {
             }
         }
 
-        // TODO Extract this to minimal-grpc-server
-        const server: grpc.Server = new grpc.Server();
-        server.addService(TestSuiteServiceService, testsuiteService);
-        const listenUrl: string = ":" + LISTEN_PORT;
-        const boundPort: number = server.bind(listenUrl, grpc.credentials.createInsecure());
-        if (boundPort === 0) {
-            return err(new Error("An error occurred binding the server to listen URL '"+ boundPort +"'"));
-        }
+        const serviceRegistrationFuncs: { (server: grpc.Server): void; }[] = [
+            (server: grpc.Server) => {
+                server.addService(TestSuiteServiceService, testsuiteService);
+            }
+        ]
+        
+        const grpcServer: MinimalGRPCServer = new MinimalGRPCServer(
+            LISTEN_PORT, 
+            GRPC_SERVER_STOP_GRACE_PERIOD_SECONDS,
+            serviceRegistrationFuncs
+        );
 
-        const signalsToHandle: Array<string> = [INTERRUPT_SIGNAL, QUIT_SIGNAL, TERM_SIGNAL];
-        const signalReceivedPromises: Array<Promise<Result<null, Error>>> = signalsToHandle.map((signal) => {
-            return new Promise((resolve, _unusedReject) => {
-                process.on(signal, () => {
-                    resolve(ok(null));
-                });
-            });
-        });
-        const anySignalReceivedPromise: Promise<Result<null, Error>> = Promise.race(signalReceivedPromises);
-
-        server.start();
-
-        await anySignalReceivedPromise;
-
-        const tryShutdownPromise: Promise<Result<null, Error>> = new Promise((resolve, _unusedReject) => {
-            server.tryShutdown(() => {
-                resolve(ok(null));
-            })
-        })
-        const timeoutPromise: Promise<Result<null, Error>> = new Promise((resolve, _unusedReject) => {
-            setTimeout(
-                () => {
-                    resolve(err(new Error("gRPC server failed to stop gracefully after waiting for " + GRPC_SERVER_STOP_GRACE_PERIOD_MILLIS + "ms")));
-                },
-                GRPC_SERVER_STOP_GRACE_PERIOD_MILLIS
-            );
-        })
-        const gracefulShutdownResult: Result<null, Error> = await Promise.race([tryShutdownPromise, timeoutPromise]);
-        if (gracefulShutdownResult.isErr()) {
-            log.debug("gRPC server has exited gracefully");
-        } else {
-            log.warn("gRPC server failed to stop gracefully after " + GRPC_SERVER_STOP_GRACE_PERIOD_MILLIS + "ms; hard-stopping now...");
-            server.forceShutdown();
-            log.debug("gRPC server was forcefully stopped");
+        const runServerResult = await grpcServer.run();
+        if (runServerResult.isErr()) {
+            return err(runServerResult.error);
         }
 
         return ok(null);

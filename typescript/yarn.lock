@@ -652,6 +652,15 @@ make-error@^1.1.1:
   resolved "https://registry.yarnpkg.com/make-error/-/make-error-1.3.6.tgz#2eb2e37ea9b67c4891f684a1394799af484cf7a2"
   integrity sha512-s8UhlNe7vPKomQhC1qFelMokr/Sc3AgNbso3n74mVPA5LTZwkB9NlXf4XPamLxJE8h0gh73rM94xvwRT2CVInw==
 
+minimal-grpc-server@^0.2.2:
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/minimal-grpc-server/-/minimal-grpc-server-0.2.2.tgz#5a2158176c84d477e8d5566923f2c722b265e76b"
+  integrity sha512-pDvFqODkRBXFXitvO5dGmGft/r/UQcYTcIbPqjtjdv0vpALKhy/gLR0xYJ8Z71l6FC7CqezQ6wyJUMAmYQRHuw==
+  dependencies:
+    grpc "^1.24.11"
+    loglevel "^1.7.1"
+    neverthrow "^4.2.2"
+
 minimatch@3.0.4, minimatch@^3.0.4:
   version "3.0.4"
   resolved "https://registry.yarnpkg.com/minimatch/-/minimatch-3.0.4.tgz#5166e286457f03306064be5497e8dbb0c3d32083"
