@@ -17,7 +17,7 @@ export class MetadataProvidingTestsuiteService implements KnownKeysOnly<ITestSui
 		this.suite = suite;
 	}
 
-	public isAvailable(call: grpc.ServerUnaryCall<null>, callback: grpc.sendUnaryData<google_protobuf_empty_pb.Empty>): void {
+	public isAvailable(call: grpc.ServerUnaryCall<google_protobuf_empty_pb.Empty>, callback: grpc.sendUnaryData<google_protobuf_empty_pb.Empty>): void {
 		callback(null, null);
 	}
 

@@ -17,15 +17,15 @@ import { KnownKeysOnly } from "./unimplemented_server_requirements";
 export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteServiceServer>{
 	    
     private readonly suite: TestSuite;
-
-	// Will be nil until setup is called
-	private postSetupNetwork: Network;
-
-	// Mutex to guard the postSetupNetwork object, so any accidental concurrent calls of SetupInfo don't generate race conditions
-	private readonly postSetupNetworkMutex: mutex.Mutex;
-
-	private readonly networkCtx: NetworkContext;
-
+    
+    // Will be nil until setup is called
+    private postSetupNetwork: Network;
+    
+    // Mutex to guard the postSetupNetwork object, so any accidental concurrent calls of SetupInfo don't generate race conditions
+    private readonly postSetupNetworkMutex: mutex.Mutex;
+    
+    private readonly networkCtx: NetworkContext;
+    
     constructor(suite: TestSuite, networkCtx: NetworkContext) {
         this.suite = suite;
         this.postSetupNetwork = null;
@@ -33,7 +33,7 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
         this.networkCtx = networkCtx;
     }
 
-    public isAvailable(call: grpc.ServerUnaryCall<null>, callback: grpc.sendUnaryData<google_protobuf_empty_pb.Empty>): void {
+    public isAvailable(call: grpc.ServerUnaryCall<google_protobuf_empty_pb.Empty>, callback: grpc.sendUnaryData<google_protobuf_empty_pb.Empty>): void {
         callback(null, null);
     }
 
@@ -74,7 +74,7 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
         const args: SetupTestArgs = call.request;
         const release = await this.postSetupNetworkMutex.acquire();
         try {
-            if (this.postSetupNetwork != null) {
+            if (this.postSetupNetwork !== null) {
                 callback(new Error("Cannot setup test; a test was already set up"), null);
                 return;
             }
@@ -96,7 +96,7 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
                 callback(userNetworkResult.error, null);
                 return;
             } 
-            if (userNetworkResult.value == null) {
+            if (userNetworkResult.value === null) {
                 callback(new Error("The test setup method returned successfully, but yielded a nil network object - this is a bug with the test's setup method accidentally returning a nil network object"), null);
             }
             this.postSetupNetwork = userNetworkResult.value;
@@ -113,7 +113,7 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
         const release = await this.postSetupNetworkMutex.acquire();
         try {
 
-            if (this.postSetupNetwork == null) {
+            if (this.postSetupNetwork === null) {
                 callback(new Error("Received a request to run the test, but the test hasn't been set up yet"), null);
                 return;
             }
@@ -146,7 +146,7 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
         // See https://medium.com/@hussachai/error-handling-in-go-a-quick-opinionated-guide-9199dd7c7f76 for details
         try {
             const runErr: Error = test.run(untypedNetwork);
-            if (runErr != null) {
+            if (runErr !== null) {
                 return err(runErr);
             }
             log.trace("Test completed successfully");

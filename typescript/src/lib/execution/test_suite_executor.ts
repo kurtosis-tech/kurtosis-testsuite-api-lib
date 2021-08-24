@@ -20,9 +20,8 @@ const QUIT_SIGNAL: string = "SIGQUIT"
 const TERM_SIGNAL: string = "SIGTERM"
 
 export class TestSuiteExecutor {
-	private readonly configurator: TestSuiteConfigurator;
-
-
+    private readonly configurator: TestSuiteConfigurator;
+    
     constructor(configurator: TestSuiteConfigurator) {
         this.configurator = configurator;
     }
@@ -69,8 +68,7 @@ export class TestSuiteExecutor {
                 // TODO SECURITY: Use HTTPS to ensure we're connecting to the real Kurtosis API servers             
                 try {
                     apiContainerClient = new ApiContainerServiceClient(kurtosisApiSocketStr, grpc.credentials.createInsecure());
-                }
-                catch(clientErr) {
+                } catch(clientErr) {
                     return err(clientErr);
                 }
 
