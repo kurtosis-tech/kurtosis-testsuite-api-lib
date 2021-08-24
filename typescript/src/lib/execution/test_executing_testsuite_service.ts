@@ -10,7 +10,7 @@ import * as log from "loglevel";
 import * as mutex from "async-mutex";
 import * as google_protobuf_empty_pb from "google-protobuf/google/protobuf/empty_pb";
 import * as grpc from "grpc";
-import { KnownKeysOnly } from "./unimplemented_server_requirements";
+import { KnownKeysOnly } from "minimal-grpc-server";
 
 
 // Service for handling endpoints when the testsuite is in test-executing mode - i.e., inside a testsnet and running a single test

@@ -8,9 +8,8 @@ import { MetadataProvidingTestsuiteService } from "./lib/execution/metadata_prov
 import { TestExecutingTestsuiteService } from "./lib/execution/test_executing_testsuite_service";
 import { TestSuiteConfigurator } from "./lib/execution/test_suite_configurator";
 import { TestSuiteExecutor } from "./lib/execution/test_suite_executor";
-import { KnownKeys, KnownKeysOnly } from "./lib/execution/unimplemented_server_requirements";
 import { newTestMetadata } from "./lib/constructor_calls";
-//import typescript bindings
+//TODO - import typescript bindings if needed
 
 //Docker Api
 export { KurtosisTestsuiteDockerEnvVar, ENCLAVE_DATA_VOLUME_MOUNTPOINT };
@@ -25,7 +24,6 @@ export { TestSuite };
 export { Test };
 
 //Execution Files
-export { KnownKeys, KnownKeysOnly }
 export { MetadataProvidingTestsuiteService };
 export { TestExecutingTestsuiteService };
 export { TestSuiteConfigurator };
@@ -34,4 +32,4 @@ export { TestSuiteExecutor };
 //Constructor Files
 export { newTestMetadata };
 
-//TODO TODO TODO - typescript generated bindings
+//TODO - typescript generated bindings if needed

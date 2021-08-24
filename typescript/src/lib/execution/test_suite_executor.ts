@@ -10,8 +10,7 @@ import { Result, err, ok } from "neverthrow";
 import * as grpc from "grpc";
 import * as log from "loglevel";
 import * as dotenv from 'dotenv';
-import { KnownKeysOnly } from "./unimplemented_server_requirements";
-import { MinimalGRPCServer } from "minimal-grpc-server";
+import { MinimalGRPCServer, KnownKeysOnly } from "minimal-grpc-server";
 
 dotenv.config();
 

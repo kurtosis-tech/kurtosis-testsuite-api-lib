@@ -7,7 +7,7 @@ import { newTestMetadata } from "../constructor_calls";
 import * as google_protobuf_empty_pb from "google-protobuf/google/protobuf/empty_pb";
 import * as grpc from "grpc";
 import * as jspb from "google-protobuf";
-import { KnownKeysOnly } from "./unimplemented_server_requirements";
+import { KnownKeysOnly } from "minimal-grpc-server";
 
 // Service handling endpoints when the testsuite is in metadata-providing mode - i.e. NOT running a testnet, without a connection to an API container
 export class MetadataProvidingTestsuiteService implements KnownKeysOnly<ITestSuiteServiceServer> {
