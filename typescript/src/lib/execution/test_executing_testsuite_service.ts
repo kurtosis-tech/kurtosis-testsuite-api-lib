@@ -10,7 +10,7 @@ import * as mutex from "async-mutex";
 import * as google_protobuf_empty_pb from "google-protobuf/google/protobuf/empty_pb";
 import * as grpc from "grpc";
 import { KnownKeysOnly } from "minimal-grpc-server";
-
+import { KurtosisTestsuiteApiLibServiceError } from "./serviceError"; //TODO - Following DRY and I think this repo specific at the moment so I can't import from anywhere
 
 // Service for handling endpoints when the testsuite is in test-executing mode - i.e., inside a testsnet and running a single test
 export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteServiceServer>{
@@ -37,7 +37,11 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
     }
 
     public getTestSuiteMetadata(call: grpc.ServerUnaryCall<google_protobuf_empty_pb.Empty>, callback: grpc.sendUnaryData<TestSuiteMetadata>): void {
-        callback(new Error("Received a get suite metadata call while the testsuite service is in test-executing mode; this is a bug in Kurtosis"), null);
+        callback(
+			new KurtosisTestsuiteApiLibServiceError(
+				grpc.status.INTERNAL, 
+				new Error("Received a get suite metadata call while the testsuite service is in test-executing mode; " + "this is a bug in Kurtosis")),
+			null);
     }
 
     public registerFiles(call: grpc.ServerUnaryCall<RegisterFilesArgs>, callback: grpc.sendUnaryData<google_protobuf_empty_pb.Empty>): void {
@@ -45,7 +49,11 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
         const testName: string = args.getTestName();
         const allTests: Map<string, Test> = this.suite.getTests();
         if (!allTests.has(testName)) { //Note - making assumption that if key existing in Map, then value should be there too
-            callback(new Error("No test '" + testName + "' found in the testsuite"), null);
+            callback(
+				new KurtosisTestsuiteApiLibServiceError(
+					grpc.status.INTERNAL,
+					new Error("No test '" + testName + "' found in the testsuite")),
+				null);
             return;
         }
         const test: Test = allTests[testName];
@@ -54,19 +62,23 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
         test.configure(testConfigBuilder);
         const testConfig: TestConfiguration = testConfigBuilder.build();
 
-        this.networkCtx.registerStaticFiles(
-			testConfig.getStaticFileFilepaths()
-		).then(registerStaticFilesResponse => {
+        this.networkCtx.registerStaticFiles(testConfig.getStaticFileFilepaths()).then(registerStaticFilesResponse => { //TODO - format
 			if (!registerStaticFilesResponse.isOk()) {
-				callback(registerStaticFilesResponse.error, null);
+				callback(
+					new KurtosisTestsuiteApiLibServiceError(
+						grpc.status.INTERNAL,
+						registerStaticFilesResponse.error),
+					null);
 				return;
 			}
 
-			this.networkCtx.registerFilesArtifacts(
-				testConfig.getFilesArtifactUrls()
-			).then(registerFilesArtifactsResponse => {
+			this.networkCtx.registerFilesArtifacts(testConfig.getFilesArtifactUrls()).then(registerFilesArtifactsResponse => { //TODO - format
 				if (!registerFilesArtifactsResponse.isOk()) {
-					callback(registerFilesArtifactsResponse.error, null);
+					callback(
+						new KurtosisTestsuiteApiLibServiceError(
+							grpc.status.INTERNAL,
+							registerFilesArtifactsResponse.error),
+						null);
 					return;
 				}
 
@@ -82,7 +94,11 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
         this.postSetupNetworkMutex.acquire().then(release => {
 			try {
 				if (this.postSetupNetwork !== null) {
-					callback(new Error("Cannot setup test; a test was already set up"), null);
+					callback(
+						new KurtosisTestsuiteApiLibServiceError(
+							grpc.status.INTERNAL,
+							new Error("Cannot setup test; a test was already set up")),
+						null);
 					return;
 				}
 
@@ -90,23 +106,34 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
 
 				const allTests: Map<string, Test> = this.suite.getTests();
 				if (!allTests.has(testName)) { //Note - making assumption that if key existing in Map, then value should be there too
-					callback(new Error("Testsuite was directed to setup test '" + testName + "', but no test with that name exists " +
-					"in the testsuite; this is a Kurtosis code bug"), null);
+					callback(
+						new KurtosisTestsuiteApiLibServiceError(
+							grpc.status.INTERNAL,
+							new Error("Testsuite was directed to setup test '" + testName + "', but no test with that name exists " +
+							"in the testsuite; this is a Kurtosis code bug")),
+						null);
 					return;
 				}
 				const test: Test = allTests[testName];
 
 				log.info("Setting up network for test '" + testName + "'...");
 				
-				test.setup(
-					this.networkCtx
-				).then(userNetworkResult => {
+				test.setup(this.networkCtx).then(userNetworkResult => {
 					if (!userNetworkResult.isOk()) {
-						callback(userNetworkResult.error, null);
+						callback(
+							new KurtosisTestsuiteApiLibServiceError(
+								grpc.status.INTERNAL,
+								userNetworkResult.error),
+							null);
 						return;
 					} 
 					if (userNetworkResult.value === null) {
-						callback(new Error("The test setup method returned successfully, but yielded a nil network object - this is a bug with the test's setup method accidentally returning a nil network object"), null);
+						callback(
+							new KurtosisTestsuiteApiLibServiceError(
+								grpc.status.INTERNAL,
+								new Error("The test setup method returned successfully, but yielded a nil network object - " +
+								"this is a bug with the test's setup method accidentally returning a nil network object")),
+							null);
 					}
 					this.postSetupNetwork = userNetworkResult.value;
 					log.info("Successfully set up test network for test '" + testName + "'");
@@ -125,7 +152,11 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
 			try {
 
 				if (this.postSetupNetwork === null) {
-					callback(new Error("Received a request to run the test, but the test hasn't been set up yet"), null);
+					callback(
+						new KurtosisTestsuiteApiLibServiceError(
+							grpc.status.INTERNAL,
+							new Error("Received a request to run the test, but the test hasn't been set up yet")),
+						null);
 					return;
 				}
 
@@ -133,19 +164,24 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
 
 				const allTests: Map<string, Test> = this.suite.getTests();
 				if (!allTests.has(testName)) {
-					callback(new Error("Testsuite was directed to run test '" + testName + "', but no test with that name exists " +
-					"in the testsuite; this is a Kurtosis code bug"), null);
+					callback(
+						new KurtosisTestsuiteApiLibServiceError(
+							grpc.status.INTERNAL,
+							new Error("Testsuite was directed to run test '" + testName + "', but no test with that name exists " +
+							"in the testsuite; this is a Kurtosis code bug")),
+						null);
 					return;
 				}
 				const test: Test = allTests[testName];
 	
 				log.info("Running test logic for test '" + testName + "'...");
-				this.runTestHelper(
-					test,
-					this.postSetupNetwork
-				).then(runTestHelperErr => {
+				this.runTestHelper(test,this.postSetupNetwork).then(runTestHelperErr => {
 					if (runTestHelperErr !== null) {
-						callback(runTestHelperErr, null);
+						callback(
+							new KurtosisTestsuiteApiLibServiceError(
+								grpc.status.INTERNAL,
+								runTestHelperErr),
+							null);
 						return;
 					}
 					log.info("Ran test logic for test " + testName);
@@ -161,9 +197,7 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
     public runTestHelper(test: Test, untypedNetwork: any): Promise<Error> {
         // See https://medium.com/@hussachai/error-handling-in-go-a-quick-opinionated-guide-9199dd7c7f76 for details
         try {
-            const resultErr: Promise<Error> = test.run(
-				untypedNetwork
-			).then(runErr => {
+            const resultErr: Promise<Error> = test.run(untypedNetwork).then(runErr => {
 				if (runErr !== null) {
 					return runErr;
 				}

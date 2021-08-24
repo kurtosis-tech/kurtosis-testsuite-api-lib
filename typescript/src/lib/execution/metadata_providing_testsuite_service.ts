@@ -8,6 +8,7 @@ import * as google_protobuf_empty_pb from "google-protobuf/google/protobuf/empty
 import * as grpc from "grpc";
 import * as jspb from "google-protobuf";
 import { KnownKeysOnly } from "minimal-grpc-server";
+import { KurtosisTestsuiteApiLibServiceError } from "./serviceError"; //TODO (Ali) - Following DRY and I think this repo specific at the moment so I can't import from anywhere
 
 // Service handling endpoints when the testsuite is in metadata-providing mode - i.e. NOT running a testnet, without a connection to an API container
 export class MetadataProvidingTestsuiteService implements KnownKeysOnly<ITestSuiteServiceServer> {
@@ -44,14 +45,26 @@ export class MetadataProvidingTestsuiteService implements KnownKeysOnly<ITestSui
 	}
 
 	public registerFiles(call: grpc.ServerUnaryCall<RegisterFilesArgs>, callback: grpc.sendUnaryData<google_protobuf_empty_pb.Empty>): void {
-		callback(new Error("Received a register files call while the testsuite service is in metadata-providing mode; this is a bug in Kurtosis"), null);
+		callback(
+			new KurtosisTestsuiteApiLibServiceError(
+				grpc.status.INTERNAL,
+				new Error("Received a register files call while the testsuite service is in metadata-providing mode; this is a bug in Kurtosis")),
+			null);
 	}
 
 	public setupTest(call: grpc.ServerUnaryCall<SetupTestArgs>, callback: grpc.sendUnaryData<google_protobuf_empty_pb.Empty>): void {
-		callback(new Error("Received a setup test call while the testsuite service is in metadata-providing mode; this is a bug in Kurtosis"), null);
+		callback(
+			new KurtosisTestsuiteApiLibServiceError(
+				grpc.status.INTERNAL,
+				new Error("Received a setup test call while the testsuite service is in metadata-providing mode; this is a bug in Kurtosis")),
+			null);
 	}
 
 	public runTest(call: grpc.ServerUnaryCall<RunTestArgs>, callback: grpc.sendUnaryData<google_protobuf_empty_pb.Empty>): void{
-		callback(new Error("Received a run test call while the testsuite service is in metadata-providing mode; this is a bug in Kurtosis"), null);
+		callback(
+			new KurtosisTestsuiteApiLibServiceError(
+				grpc.status.INTERNAL,
+				new Error("Received a run test call while the testsuite service is in metadata-providing mode; this is a bug in Kurtosis")),
+			null);
 	}
 }

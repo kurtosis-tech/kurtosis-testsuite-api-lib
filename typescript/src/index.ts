@@ -15,8 +15,3 @@ export { MetadataProvidingTestsuiteService } from "./lib/execution/metadata_prov
 export { TestExecutingTestsuiteService } from "./lib/execution/test_executing_testsuite_service";
 export { TestSuiteConfigurator } from "./lib/execution/test_suite_configurator";
 export { TestSuiteExecutor } from "./lib/execution/test_suite_executor";
-
-//Constructor Files
-export { newTestMetadata } from "./lib/constructor_calls";
-
-//TODO - typescript generated bindings if needed
