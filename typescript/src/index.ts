@@ -1,35 +1,22 @@
-import { KurtosisTestsuiteDockerEnvVar, ENCLAVE_DATA_VOLUME_MOUNTPOINT } from "../src/kurtosis_testsuite_docker_api/kurtosis_testsuite_docker_api";
-import { LISTEN_PROTOCOL, LISTEN_PORT } from "../src/kurtosis_testsuite_rpc_api_consts/kurtosis_testsuite_rpc_api_consts";
-import { TestConfigurationBuilder } from "../src/lib/testsuite/test_configuration_builder";
-import { TestConfiguration } from "./lib/testsuite/test_configuration";
-import { TestSuite } from "../src/lib/testsuite/test_suite";
-import { Test } from "../src/lib/testsuite/test";
-import { MetadataProvidingTestsuiteService } from "./lib/execution/metadata_providing_testsuite_service";
-import { TestExecutingTestsuiteService } from "./lib/execution/test_executing_testsuite_service";
-import { TestSuiteConfigurator } from "./lib/execution/test_suite_configurator";
-import { TestSuiteExecutor } from "./lib/execution/test_suite_executor";
-import { newTestMetadata } from "./lib/constructor_calls";
-//TODO - import typescript bindings if needed
-
 //Docker Api
-export { KurtosisTestsuiteDockerEnvVar, ENCLAVE_DATA_VOLUME_MOUNTPOINT };
+export { KurtosisTestsuiteDockerEnvVar, ENCLAVE_DATA_VOLUME_MOUNTPOINT } from "../src/kurtosis_testsuite_docker_api/kurtosis_testsuite_docker_api";
 
 //RPC Api Consts
-export { LISTEN_PROTOCOL, LISTEN_PORT };
+export { LISTEN_PROTOCOL, LISTEN_PORT } from "../src/kurtosis_testsuite_rpc_api_consts/kurtosis_testsuite_rpc_api_consts";
 
 //Testsuite Files
-export { TestConfigurationBuilder };
-export { TestConfiguration };
-export { TestSuite };
-export { Test };
+export { TestConfigurationBuilder } from "../src/lib/testsuite/test_configuration_builder";
+export { TestConfiguration } from "./lib/testsuite/test_configuration";
+export { TestSuite } from "../src/lib/testsuite/test_suite";
+export { Test } from "../src/lib/testsuite/test";
 
 //Execution Files
-export { MetadataProvidingTestsuiteService };
-export { TestExecutingTestsuiteService };
-export { TestSuiteConfigurator };
-export { TestSuiteExecutor };
+export { MetadataProvidingTestsuiteService } from "./lib/execution/metadata_providing_testsuite_service";
+export { TestExecutingTestsuiteService } from "./lib/execution/test_executing_testsuite_service";
+export { TestSuiteConfigurator } from "./lib/execution/test_suite_configurator";
+export { TestSuiteExecutor } from "./lib/execution/test_suite_executor";
 
 //Constructor Files
-export { newTestMetadata };
+export { newTestMetadata } from "./lib/constructor_calls";
 
 //TODO - typescript generated bindings if needed

@@ -46,9 +46,9 @@ export class TestSuiteExecutor {
             return err(new Error("The '" + KurtosisTestsuiteDockerEnvVar.CustomParamsJson + "' serialized custom params environment variable was defined, but is emptystring"));
         }
 
-        const logLevelResult: Result<null, Error> = this.configurator.setLogLevelResult(logLevelStr);
-        if (!logLevelResult.isOk()) {
-            return err(logLevelResult.error);
+        const setLogLevelResult: Result<null, Error> = this.configurator.setLogLevel(logLevelStr);
+        if (!setLogLevelResult.isOk()) {
+            return err(setLogLevelResult.error);
         }
 
         const parseParamsAndCreateSuiteResult: Result<TestSuite, Error> = this.configurator.parseParamsAndCreateSuite(customSerializedParamsStr);
@@ -58,45 +58,48 @@ export class TestSuiteExecutor {
         const suite: TestSuite = parseParamsAndCreateSuiteResult.value;
 
         let testsuiteService: KnownKeysOnly<ITestSuiteServiceServer>;
-        let apiContainerClient: ApiContainerServiceClient;
+        let apiContainerClient: ApiContainerServiceClient = null;
+
+        if (kurtosisApiSocketStr === "") {
+            testsuiteService = new MetadataProvidingTestsuiteService(suite);
+        } else {
+
+            // TODO SECURITY: Use HTTPS to ensure we're connecting to the real Kurtosis API servers             
+            try {
+                apiContainerClient = new ApiContainerServiceClient(kurtosisApiSocketStr, grpc.credentials.createInsecure());
+            } catch(clientErr) {
+                return err(clientErr);
+            }
+        }
 
         try {
-            if (kurtosisApiSocketStr === "") {
-                testsuiteService = new MetadataProvidingTestsuiteService(suite);
-            } else {
-
-                // TODO SECURITY: Use HTTPS to ensure we're connecting to the real Kurtosis API servers             
-                try {
-                    apiContainerClient = new ApiContainerServiceClient(kurtosisApiSocketStr, grpc.credentials.createInsecure());
-                } catch(clientErr) {
-                    return err(clientErr);
-                }
-
+            if (kurtosisApiSocketStr !== "") { //TODO (Ali) - Does not follow DRY, but the solution I could think of
                 const networkCtx: NetworkContext = new NetworkContext(apiContainerClient, ENCLAVE_DATA_VOLUME_MOUNTPOINT);
                 testsuiteService = new TestExecutingTestsuiteService(suite, networkCtx);
-
             }
 
-        const serviceRegistrationFuncs: { (server: grpc.Server): void; }[] = [
-            (server: grpc.Server) => {
-                server.addService(TestSuiteServiceService, testsuiteService);
-            }
-        ]
-        
-        const grpcServer: MinimalGRPCServer = new MinimalGRPCServer(
-            LISTEN_PORT, 
-            GRPC_SERVER_STOP_GRACE_PERIOD_SECONDS,
-            serviceRegistrationFuncs
-        );
+            const serviceRegistrationFuncs: { (server: grpc.Server): void; }[] = [
+                (server: grpc.Server) => {
+                    server.addService(TestSuiteServiceService, testsuiteService);
+                }
+            ]
+            
+            const grpcServer: MinimalGRPCServer = new MinimalGRPCServer(
+                LISTEN_PORT, 
+                GRPC_SERVER_STOP_GRACE_PERIOD_SECONDS,
+                serviceRegistrationFuncs
+            );
 
-        const runServerResult = await grpcServer.run();
-        if (runServerResult.isErr()) {
-            return err(runServerResult.error);
-        }
+            const runServerResult = await grpcServer.run();
+            if (runServerResult.isErr()) {
+                return err(runServerResult.error);
+            }
 
             return ok(null);
         } finally {
-            apiContainerClient.close();
+            if (apiContainerClient !== null) {
+                apiContainerClient.close();
+            }
         }
     }
 }

@@ -13,10 +13,10 @@ export interface Test {
 	configure(builder: TestConfigurationBuilder): void;
 
 	// Docs available at https://docs.kurtosistech.com/kurtosis-testsuite-api-lib/lib-documentation
-	setup(networkCtx: NetworkContext): Result<Network, Error>;
+	setup(networkCtx: NetworkContext): Promise<Result<Network, Error>>;
 
 	// TODO - 'network' should be a parameterized type representing the network that this test consumes
 	// as produced by the NetworkLoader
 	// Docs available at https://docs.kurtosistech.com/kurtosis-testsuite-api-lib/lib-documentation
-	run(network: Network): Error;
+	run(network: Network): Promise<Error>;
 }

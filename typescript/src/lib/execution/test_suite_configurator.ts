@@ -9,7 +9,7 @@ import { Result } from "neverthrow";
 // Docs available at https://docs.kurtosistech.com/kurtosis-testsuite-api-lib/lib-documentation
 export interface TestSuiteConfigurator {
 	// Docs available at https://docs.kurtosistech.com/kurtosis-testsuite-api-lib/lib-documentation
-	setLogLevelResult(logLevelStr: string): Result<null, Error>;
+	setLogLevel(logLevelStr: string): Result<null, Error>;
 
 	// Docs available at https://docs.kurtosistech.com/kurtosis-testsuite-api-lib/lib-documentation
 	parseParamsAndCreateSuite(paramsJsonStr: string): Result<TestSuite, Error>;
