@@ -54,7 +54,7 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
 				grpc.status.INTERNAL,
 				new Error("No test '" + testName + "' found in the testsuite")
 			);
-            callback(serviceError, null);
+			callback(serviceError, null);
         }
         const test: Test = allTests[testName];
 
