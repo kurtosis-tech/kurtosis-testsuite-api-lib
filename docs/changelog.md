@@ -1,4 +1,7 @@
 # TBD
+### Changes
+* Use the devtools version of package-updating
+
 ### Features
 * Added typescript build script for compiling all typescript files into a single .js file
 * Ported over `kurtosis_testsuite_docker_api` and `kurtosis_testsuite_rpc_api_consts` to typescript
@@ -10,6 +13,7 @@
 
 ### Fixes
 * Replaced references to "Kurtosis Lib" in the changelog with "testsuite API lib"
+* Fixed `regenerate-protobuf-bindings` script that got broken when reshuffling Typescript directory hierarchy
 
 # 0.4.0
 ### Removed
