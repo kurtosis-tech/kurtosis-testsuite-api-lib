@@ -64,7 +64,7 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
 
 			this.networkCtx.registerFilesArtifacts(
 				testConfig.getFilesArtifactUrls()
-			).then( registerFilesArtifactsResponse => {
+			).then(registerFilesArtifactsResponse => {
 				if (!registerFilesArtifactsResponse.isOk()) {
 					callback(registerFilesArtifactsResponse.error, null);
 					return;
