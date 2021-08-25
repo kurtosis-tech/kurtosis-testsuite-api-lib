@@ -22,7 +22,7 @@ export class MetadataProvidingTestsuiteService implements KnownKeysOnly<ITestSui
 
     public getTestSuiteMetadata(call: grpc.ServerUnaryCall<google_protobuf_empty_pb.Empty>, callback: grpc.sendUnaryData<TestSuiteMetadata>): void {
         const allTestMetadata: Map<string, TestMetadata> = new Map();
-        for (let [testName, test] of this.suite.getTests().entries()) {
+        for (const [testName, test] of this.suite.getTests().entries()) {
             const testConfigBuilder: TestConfigurationBuilder = new TestConfigurationBuilder();
             test.configure(testConfigBuilder);
             const testConfig: TestConfiguration = testConfigBuilder.build();

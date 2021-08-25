@@ -13,7 +13,7 @@ export function newTestMetadata(isPartitioningEnabled: boolean, setupTimeoutSeco
 export function newTestSuiteMetadata(allTestMetadata: Map<string, TestMetadata>): TestSuiteMetadata {
     const result: TestSuiteMetadata = new TestSuiteMetadata();
     const resultMap: jspb.Map<string, TestMetadata> = result.getTestMetadataMap();
-    for (let [allTestMetadataId, allTestMetadataTestSuite] of allTestMetadata.entries()) {
+    for (const [allTestMetadataId, allTestMetadataTestSuite] of allTestMetadata.entries()) {
         resultMap.set(allTestMetadataId, allTestMetadataTestSuite);
     }
     
