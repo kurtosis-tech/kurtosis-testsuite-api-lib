@@ -8,9 +8,9 @@ import { Result } from "neverthrow";
 
 // Docs available at https://docs.kurtosistech.com/kurtosis-testsuite-api-lib/lib-documentation
 export interface TestSuiteConfigurator {
-	// Docs available at https://docs.kurtosistech.com/kurtosis-testsuite-api-lib/lib-documentation
-	setLogLevel(logLevelStr: string): Result<null, Error>;
+    // Docs available at https://docs.kurtosistech.com/kurtosis-testsuite-api-lib/lib-documentation
+    setLogLevel(logLevelStr: string): Result<null, Error>;
 
-	// Docs available at https://docs.kurtosistech.com/kurtosis-testsuite-api-lib/lib-documentation
-	parseParamsAndCreateSuite(paramsJsonStr: string): Result<TestSuite, Error>;
+    // Docs available at https://docs.kurtosistech.com/kurtosis-testsuite-api-lib/lib-documentation
+    parseParamsAndCreateSuite(paramsJsonStr: string): Result<TestSuite, Error>;
 }

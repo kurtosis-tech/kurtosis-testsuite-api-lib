@@ -52,11 +52,11 @@ export class TestConfigurationBuilder {
     
     public build(): TestConfiguration {
         return new TestConfiguration(
-			this.setupTimeoutSeconds, 
-			this.runTimeoutSeconds, 
-			this.isPartioningEnabled, 
-			this.staticFileFilepaths, 
-			this.filesArtifactUrls);
+            this.setupTimeoutSeconds, 
+            this.runTimeoutSeconds, 
+            this.isPartioningEnabled, 
+            this.staticFileFilepaths, 
+            this.filesArtifactUrls);
     }
 
 }
