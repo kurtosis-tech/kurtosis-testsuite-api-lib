@@ -1,11 +1,22 @@
 # TBD
 ### Changes
+* Use the devtools version of package-updating
+
+### Features
+* Added typescript build script for compiling all typescript files into a single .js file
+* Ported over `kurtosis_testsuite_docker_api` and `kurtosis_testsuite_rpc_api_consts` to typescript
+* Added `lib/testsuite` files into typescript
+* Added `lib/execution` files to typescript
+* Added a Typescript minimal gRPC server inside Typescript `TestsuiteExecutor`, which should be moved to the `minimal-grpc-server` library
+* Added a .gitignore file which doesn't add `node_modules` or `build` directories
+* Configured CircleCI checks & publishing for Typescript library
 * Added Apache-2 licensing
 * Switched to using the Kurtosis docs-checker orb rather than a custom docs-checking job
 * Use correct `minimal-grpc-server` module
 
 ### Fixes
 * Replaced references to "Kurtosis Lib" in the changelog with "testsuite API lib"
+* Fixed `regenerate-protobuf-bindings` script that got broken when reshuffling Typescript directory hierarchy
 
 # 0.4.0
 ### Removed
