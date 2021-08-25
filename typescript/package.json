@@ -1,0 +1,51 @@
+{
+    "name": "kurtosis-testsuite-api-lib",
+    "version": "0.4.0",
+    "description": "This repo contains a Typescript library for writing a Kurtosis testsuite.",
+    "main": "./build/index",
+    "types": "./build/index",
+    "scripts": {
+        "build": "tsc && cp -R src/kurtosis_testsuite_rpc_api_bindings build/",
+        "test": "ts-mocha -p tsconfig.json 'test/**/*.ts'"
+    },
+    "files": [
+        "build"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/kurtosis-tech/kurtosis-testsuite-api-lib.git"
+    },
+    "keywords": [
+        "kurtosis",
+        "testsuite"
+    ],
+    "author": "Kurtosis Technologies Inc <accounts@kurtosistech.com> (https://www.kurtosistech.com/)",
+    "license": "Apache-2.0",
+    "bugs": {
+        "url": "https://github.com/kurtosis-tech/kurtosis-testsuite-api-lib/issues"
+    },
+    "homepage": "https://github.com/kurtosis-tech/kurtosis-testsuite-api-lib",
+    "engines": {
+        "node": ">=14.17.0"
+    },
+    "dependencies": {
+        "async-mutex": "^0.3.1",
+        "dotenv": "^10.0.0",
+        "google-protobuf": "^3.17.3",
+        "grpc": "^1.24.11",
+        "kurtosis-core-api-lib": "^0.13.2",
+        "loglevel": "^1.7.1",
+        "minimal-grpc-server": "^0.3.3",
+        "neverthrow": "^4.2.2"
+    },
+    "devDependencies": {
+        "@types/chai": "^4.2.21",
+        "@types/google-protobuf": "^3.15.5",
+        "@types/mocha": "^9.0.0",
+        "@types/node": "^16.6.1",
+        "chai": "^4.3.4",
+        "mocha": "^9.1.0",
+        "ts-mocha": "^8.0.0",
+        "typescript": "^4.3.5"
+    }
+}
