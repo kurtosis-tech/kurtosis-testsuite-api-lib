@@ -55,9 +55,11 @@ export class TestSuiteExecutor {
 
         let testsuiteService: KnownKeysOnly<ITestSuiteServiceServer>;
         let apiContainerClient: ApiContainerServiceClient = null;
+        let postShutdownHook: () => void;
 
         if (kurtosisApiSocketStr === "") {
             testsuiteService = new MetadataProvidingTestsuiteService(suite);
+            postShutdownHook = null;
         } else {
 
             // TODO SECURITY: Use HTTPS to ensure we're connecting to the real Kurtosis API servers             
@@ -66,14 +68,13 @@ export class TestSuiteExecutor {
             } catch(clientErr) {
                 return err(clientErr);
             }
+
+            postShutdownHook = () => apiContainerClient.close();
+            const networkCtx: NetworkContext = new NetworkContext(apiContainerClient, ENCLAVE_DATA_VOLUME_MOUNTPOINT);
+            testsuiteService = new TestExecutingTestsuiteService(suite, networkCtx);
         }
 
         try {
-            if (kurtosisApiSocketStr !== "") { //TODO (Ali) - Does not follow DRY, but the solution I could think of
-                const networkCtx: NetworkContext = new NetworkContext(apiContainerClient, ENCLAVE_DATA_VOLUME_MOUNTPOINT);
-                testsuiteService = new TestExecutingTestsuiteService(suite, networkCtx);
-            }
-
             const serviceRegistrationFuncs: { (server: grpc.Server): void; }[] = [
                 (server: grpc.Server) => {
                     server.addService(TestSuiteServiceService, testsuiteService);
@@ -93,8 +94,8 @@ export class TestSuiteExecutor {
 
             return ok(null);
         } finally {
-            if (apiContainerClient !== null) {
-                apiContainerClient.close();
+            if (postShutdownHook) {
+                postShutdownHook();
             }
         }
     }

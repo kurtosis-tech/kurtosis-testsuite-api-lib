@@ -18,7 +18,7 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
     private readonly suite: TestSuite;
     
     // Will be nil until setup is called
-    private postSetupNetwork: Network;
+    private postSetupNetwork: Network | null;
     
     // Mutex to guard the postSetupNetwork object, so any accidental concurrent calls of SetupInfo don't generate race conditions
     private readonly postSetupNetworkMutex: mutex.Mutex;
@@ -47,19 +47,19 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
         if (!allTests.has(testName)) { //Note - making assumption that if key existing in Map, then value should be there too
             callback(new Error("No test '" + testName + "' found in the testsuite"), null);
         }
-        const test: Test = allTests[testName];
+        const test: Test = allTests.get(testName)!;
 
         const testConfigBuilder: TestConfigurationBuilder = new TestConfigurationBuilder();
         test.configure(testConfigBuilder);
         const testConfig: TestConfiguration = testConfigBuilder.build();
 
-        this.networkCtx.registerStaticFiles(testConfig.getStaticFileFilepaths()).then(registerStaticFilesResponse => { //TODO - format
+        this.networkCtx.registerStaticFiles(testConfig.getStaticFileFilepaths()).then(registerStaticFilesResponse => {
             if (!registerStaticFilesResponse.isOk()) {
                 callback(registerStaticFilesResponse.error, null);
                 return;
             }
 
-            this.networkCtx.registerFilesArtifacts(testConfig.getFilesArtifactUrls()).then(registerFilesArtifactsResponse => { //TODO - format
+            this.networkCtx.registerFilesArtifacts(testConfig.getFilesArtifactUrls()).then(registerFilesArtifactsResponse => {
                 if (!registerFilesArtifactsResponse.isOk()) {
                     callback(registerFilesArtifactsResponse.error, null);
                     return;
@@ -125,9 +125,13 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
         if (!userNetworkResult.isOk()) {
             return err(userNetworkResult.error);
         } 
+        if (userNetworkResult.value === undefined) {
+            return err(new Error("The test setup method returned successfully, but yielded an undefined network object - " +
+            "this is a bug with the test's setup method accidentally returning an undefined network object"));
+        }
         if (userNetworkResult.value === null) {
-            return err(new Error("The test setup method returned successfully, but yielded a nil network object - " +
-            "this is a bug with the test's setup method accidentally returning a nil network object"));
+            return err(new Error("The test setup method returned successfully, but yielded a null network object - " +
+            "this is a bug with the test's setup method accidentally returning a null network object"));
         }
         this.postSetupNetwork = userNetworkResult.value;
         log.info("Successfully set up test network for test '" + testName + "'");
