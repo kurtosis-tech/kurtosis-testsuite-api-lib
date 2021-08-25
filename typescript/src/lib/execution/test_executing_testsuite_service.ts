@@ -10,7 +10,6 @@ import * as mutex from "async-mutex";
 import * as google_protobuf_empty_pb from "google-protobuf/google/protobuf/empty_pb";
 import * as grpc from "grpc";
 import { KnownKeysOnly } from "minimal-grpc-server";
-import { KurtosisTestsuiteApiLibServiceError } from "./serviceError"; //TODO - Following DRY and I think this repo specific at the moment so I can't import from anywhere
 import { Result, ok, err } from "neverthrow";
 
 // Service for handling endpoints when the testsuite is in test-executing mode - i.e., inside a testsnet and running a single test
@@ -38,11 +37,7 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
 	}
 
 	public getTestSuiteMetadata(call: grpc.ServerUnaryCall<google_protobuf_empty_pb.Empty>, callback: grpc.sendUnaryData<TestSuiteMetadata>): void {
-		const serviceError: KurtosisTestsuiteApiLibServiceError = new KurtosisTestsuiteApiLibServiceError(
-			grpc.status.INTERNAL, 
-			new Error("Received a get suite metadata call while the testsuite service is in test-executing mode; " + "this is a bug in Kurtosis")
-		);
-		callback(serviceError, null);
+		callback(new Error("Received a get suite metadata call while the testsuite service is in test-executing mode; " + "this is a bug in Kurtosis"), null);
 	}
 
 	public registerFiles(call: grpc.ServerUnaryCall<RegisterFilesArgs>, callback: grpc.sendUnaryData<google_protobuf_empty_pb.Empty>): void {
@@ -50,11 +45,7 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
 		const testName: string = args.getTestName();
 		const allTests: Map<string, Test> = this.suite.getTests();
 		if (!allTests.has(testName)) { //Note - making assumption that if key existing in Map, then value should be there too
-			const serviceError: KurtosisTestsuiteApiLibServiceError = new KurtosisTestsuiteApiLibServiceError(
-				grpc.status.INTERNAL,
-				new Error("No test '" + testName + "' found in the testsuite")
-			);
-			callback(serviceError, null);
+			callback(new Error("No test '" + testName + "' found in the testsuite"), null);
 		}
 		const test: Test = allTests[testName];
 
@@ -64,21 +55,13 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
 
 		this.networkCtx.registerStaticFiles(testConfig.getStaticFileFilepaths()).then(registerStaticFilesResponse => { //TODO - format
 			if (!registerStaticFilesResponse.isOk()) {
-				const serviceError: KurtosisTestsuiteApiLibServiceError = new KurtosisTestsuiteApiLibServiceError(
-					grpc.status.INTERNAL,
-					registerStaticFilesResponse.error
-				);
-				callback(serviceError, null);
+				callback(registerStaticFilesResponse.error, null);
 				return;
 			}
 
 			this.networkCtx.registerFilesArtifacts(testConfig.getFilesArtifactUrls()).then(registerFilesArtifactsResponse => { //TODO - format
 				if (!registerFilesArtifactsResponse.isOk()) {
-					const serviceError: KurtosisTestsuiteApiLibServiceError = new KurtosisTestsuiteApiLibServiceError(
-						grpc.status.INTERNAL,
-						registerFilesArtifactsResponse.error
-					);
-					callback(serviceError, null);
+					callback(registerFilesArtifactsResponse.error, null);
 					return;
 				}
 
@@ -97,11 +80,7 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
 
 		this.postSetupNetworkMutex.runExclusive(functionInsideMutex).then(setupTestResult => {
 			if (!setupTestResult.isOk()) {
-				const serviceError: KurtosisTestsuiteApiLibServiceError = new KurtosisTestsuiteApiLibServiceError(
-					grpc.status.INTERNAL,
-					setupTestResult.error
-				);
-				callback(serviceError, null);
+				callback(setupTestResult.error, null);
 			} else {
 				callback(null, null);
 			}
@@ -116,11 +95,7 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
 		}
 		this.postSetupNetworkMutex.runExclusive(functionInsideMutex).then(runTestResult => {
 			if (!runTestResult.isOk()) {
-				const serviceError: KurtosisTestsuiteApiLibServiceError = new KurtosisTestsuiteApiLibServiceError(
-					grpc.status.INTERNAL,
-					runTestResult.error
-				)
-				callback(serviceError, null);
+				callback(runTestResult.error, null);
 			} else {
 				callback(null, null);
 			}
@@ -129,23 +104,6 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
 
 
 	//HELPER METHODS
-
-	// Little helper function that runs the test and captures panics on test failures, returning them as errors
-	public runTestHelper(test: Test, untypedNetwork: any): Promise<Error> {
-		// See https://medium.com/@hussachai/error-handling-in-go-a-quick-opinionated-guide-9199dd7c7f76 for details
-		try {
-			const resultErr: Promise<Error> = test.run(untypedNetwork).then(runErr => {
-				if (runErr !== null) {
-					return runErr;
-				}
-				log.trace("Test completed successfully");
-				return null;
-			})
-			return resultErr;
-		} catch(exceptionErr) {
-				log.trace("Caught panic while running test: " + exceptionErr);
-		}
-	}
 
 	public async setupTestAsync(args: SetupTestArgs): Promise<Result<null, Error>> {
 		if (this.postSetupNetwork !== null) {
@@ -193,12 +151,19 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
 		const test: Test = allTests[testName];
 
 		log.info("Running test logic for test '" + testName + "'...");
-		this.runTestHelper(test,this.postSetupNetwork).then(runTestHelperErr => {
-			if (runTestHelperErr !== null) {
-				return err(runTestHelperErr);
-			}
-			log.info("Ran test logic for test " + testName);
-			return ok(null);
-		})
+
+        let runTestResult: Result<null, Error>;
+        try {
+            runTestResult = await test.run(this.postSetupNetwork);
+        } catch(exception) {
+            return err(exception);
+        }
+
+        if (!runTestResult.isOk()) {
+            return err(runTestResult.error);
+        }
+        log.info("Ran test logic for test " + testName);
+        return ok(null);
 	}
+
 }

@@ -18,5 +18,5 @@ export interface Test {
 	// TODO - 'network' should be a parameterized type representing the network that this test consumes
 	// as produced by the NetworkLoader
 	// Docs available at https://docs.kurtosistech.com/kurtosis-testsuite-api-lib/lib-documentation
-	run(network: Network): Promise<Error>;
+	run(network: Network): Promise<Result<null, Error>>;
 }
