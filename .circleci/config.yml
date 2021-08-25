@@ -78,12 +78,6 @@ workflows:
               ignore:
                 - develop
                 - master
-      - check_docs:
-          filters:
-            branches:
-              ignore:
-                - develop
-                - master
       - check_typescript:
           filters:
             branches:
