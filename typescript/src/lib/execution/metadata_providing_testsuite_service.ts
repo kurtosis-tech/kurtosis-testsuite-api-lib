@@ -3,10 +3,9 @@ import { TestMetadata, TestSuiteMetadata, RegisterFilesArgs, SetupTestArgs, RunT
 import { TestConfigurationBuilder } from "../testsuite/test_configuration_builder";
 import { TestConfiguration } from "../testsuite/test_configuration";
 import { TestSuite } from "../testsuite/test_suite";
-import { newTestMetadata } from "../constructor_calls";
+import { newTestMetadata, newTestSuiteMetadata } from "../constructor_calls";
 import * as google_protobuf_empty_pb from "google-protobuf/google/protobuf/empty_pb";
 import * as grpc from "grpc";
-import * as jspb from "google-protobuf";
 import { KnownKeysOnly } from "minimal-grpc-server";
 
 // Service handling endpoints when the testsuite is in metadata-providing mode - i.e. NOT running a testnet, without a connection to an API container
@@ -35,11 +34,7 @@ export class MetadataProvidingTestsuiteService implements KnownKeysOnly<ITestSui
             allTestMetadata.set(testName, testMetadata);
         }
 
-        const testSuiteMetadata: TestSuiteMetadata = new TestSuiteMetadata();
-        const testSuiteMetadataMap: jspb.Map<string, TestMetadata> = testSuiteMetadata.getTestMetadataMap();
-        for (let [allTestMetadataId, allTestMetadataTestSuite] of allTestMetadata.entries()) {
-            testSuiteMetadataMap.set(allTestMetadataId, allTestMetadataTestSuite);
-        }
+        const testSuiteMetadata: TestSuiteMetadata = newTestSuiteMetadata(allTestMetadata);
         return callback(null, testSuiteMetadata);
     }
 

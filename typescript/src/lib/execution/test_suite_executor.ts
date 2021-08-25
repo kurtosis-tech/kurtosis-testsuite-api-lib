@@ -8,10 +8,7 @@ import { KurtosisTestsuiteDockerEnvVar, ENCLAVE_DATA_VOLUME_MOUNTPOINT } from ".
 import { LISTEN_PORT } from "../../kurtosis_testsuite_rpc_api_consts/kurtosis_testsuite_rpc_api_consts";
 import { Result, err, ok } from "neverthrow";
 import * as grpc from "grpc";
-import * as dotenv from 'dotenv';
-import { MinimalGRPCServer, KnownKeysOnly } from "minimal-grpc-server";
-
-dotenv.config();
+import { MinimalGRPCServer, KnownKeysOnly, TypedServerOverride } from "minimal-grpc-server";
 
 const GRPC_SERVER_STOP_GRACE_PERIOD_SECONDS: number = 5;
 
@@ -24,29 +21,26 @@ export class TestSuiteExecutor {
 
     public async run(): Promise<Result<null, Error>> {
         // NOTE: This can be empty if the testsuite is in metadata-providing mode
-        const kurtosisApiSocketStr: string | undefined = process.env[KurtosisTestsuiteDockerEnvVar.KurtosisApiSocket];
-        if (kurtosisApiSocketStr === undefined) {
-            return err(new Error("The '" + KurtosisTestsuiteDockerEnvVar.KurtosisApiSocket + "' string environment variable was undefined"));
+        const maybeKurtosisApiSocketStr: string | undefined = process.env[KurtosisTestsuiteDockerEnvVar.KurtosisApiSocket];
+        if (maybeKurtosisApiSocketStr === undefined) {
+            return err(new Error("Expected an '" + KurtosisTestsuiteDockerEnvVar.KurtosisApiSocket + "' string environment variable containing the kurtosis api socket string, but none was found"));
         }
+        const kurtosisApiSocketStr: string = maybeKurtosisApiSocketStr!;
 
-        if (!(KurtosisTestsuiteDockerEnvVar.LogLevel in process.env)) {
+        const maybeLogLevelStr: string | undefined = process.env[KurtosisTestsuiteDockerEnvVar.LogLevel];
+        if (maybeLogLevelStr === undefined) {
             return err(new Error("Expected an '" + KurtosisTestsuiteDockerEnvVar.LogLevel + "' environment variable containing the log level string that the testsuite should log at, but none was found"));
         }
-        const logLevelStr: string | undefined = process.env[KurtosisTestsuiteDockerEnvVar.LogLevel];
-        if (logLevelStr === undefined) {
-            return err(new Error("The '" + KurtosisTestsuiteDockerEnvVar.LogLevel + "' loglevel environment variable was undefined"));
-        }
+        const logLevelStr: string = maybeLogLevelStr!;
         if (logLevelStr === "") {
             return err(new Error("The '" + KurtosisTestsuiteDockerEnvVar.LogLevel + "' loglevel environment variable was defined, but is emptystring"));
         }
 
-        if (!(KurtosisTestsuiteDockerEnvVar.CustomParamsJson in process.env)) {
+        const maybeCustomSerializedParamsStr: string | undefined = process.env[KurtosisTestsuiteDockerEnvVar.CustomParamsJson];
+        if (maybeCustomSerializedParamsStr === undefined) {
             return err(new Error("Expected an '" + KurtosisTestsuiteDockerEnvVar.CustomParamsJson + "' environment variable containing the serialized custom params that the testsuite will consume, but none was found"));
         }
-        const customSerializedParamsStr: string | undefined = process.env[KurtosisTestsuiteDockerEnvVar.CustomParamsJson];
-        if (customSerializedParamsStr === undefined) {
-            return err(new Error("The '" + KurtosisTestsuiteDockerEnvVar.CustomParamsJson + "' serialized custom params environment variable was undefined"));
-        }
+        const customSerializedParamsStr: string = maybeCustomSerializedParamsStr!;
         if (customSerializedParamsStr === "") {
             return err(new Error("The '" + KurtosisTestsuiteDockerEnvVar.CustomParamsJson + "' serialized custom params environment variable was defined, but is emptystring"));
         }
@@ -83,9 +77,9 @@ export class TestSuiteExecutor {
         }
 
         try {
-            const serviceRegistrationFuncs: { (server: grpc.Server): void; }[] = [
-                (server: grpc.Server) => {
-                    server.addService(TestSuiteServiceService, testsuiteService);
+            const serviceRegistrationFuncs: { (server: TypedServerOverride): void; }[] = [
+                (server: TypedServerOverride) => {
+                    server.addTypedService(TestSuiteServiceService, testsuiteService);
                 }
             ]
             
