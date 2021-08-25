@@ -1,39 +1,28 @@
-import { TestSuiteServiceService, ITestSuiteServiceService } from "../../kurtosis_testsuite_rpc_api_bindings/testsuite_service_grpc_pb";
-import { NetworkContext, newApiContainerServiceClient } from "kurtosis-core-api-lib"; //TODO
+import { TestSuiteServiceService, ITestSuiteServiceServer } from "../../kurtosis_testsuite_rpc_api_bindings/testsuite_service_grpc_pb";
+import { NetworkContext, ApiContainerServiceClient } from "kurtosis-core-api-lib";
 import { TestExecutingTestsuiteService } from "./test_executing_testsuite_service";
 import { TestSuiteConfigurator } from "./test_suite_configurator";
 import { MetadataProvidingTestsuiteService } from "./metadata_providing_testsuite_service";
-import { TestSuite } from "../testsuite/test_suite"; //TODO
+import { TestSuite } from "../testsuite/test_suite";
 import { KurtosisTestsuiteDockerEnvVar, ENCLAVE_DATA_VOLUME_MOUNTPOINT } from "../../kurtosis_testsuite_docker_api/kurtosis_testsuite_docker_api";
 import { LISTEN_PORT } from "../../kurtosis_testsuite_rpc_api_consts/kurtosis_testsuite_rpc_api_consts";
-//"github.com/kurtosis-tech/minimal-grpc-server/server" //TODO
 import { Result, err, ok } from "neverthrow";
 import * as grpc from "grpc";
-import * as log from "loglevel";
-import { MinimalGRPCServer } from "minimal-grpc-server";
-
-//TODO Below
-//import { process } from "node"; //TODO - don't need line but need the dependency = npm i --save-dev @types/node for EnvVar
-import * as dotenv from 'dotenv'; //"os" //TODO
-//import * as time from "date-and-time"; //npm i --save-dev @types/date-and-time
-//import * as date from "date-fns"; //npm install date-fns --save
+import * as dotenv from 'dotenv';
+import { MinimalGRPCServer, KnownKeysOnly } from "minimal-grpc-server";
 
 dotenv.config();
 
 const GRPC_SERVER_STOP_GRACE_PERIOD_SECONDS: number = 5;
-const INTERRUPT_SIGNAL: string = "SIGNINT"
-const QUIT_SIGNAL: string = "SIGQUIT"
-const TERM_SIGNAL: string = "SIGTERM"
 
-class TestSuiteExecutor {
-	private readonly configurator: TestSuiteConfigurator;
-
-
+export class TestSuiteExecutor {
+    private readonly configurator: TestSuiteConfigurator;
+    
     constructor(configurator: TestSuiteConfigurator) {
         this.configurator = configurator;
     }
 
-    public async run(): Promise<Result<null, Error>> { //TODO - return type
+    public async run(): Promise<Result<null, Error>> {
         // NOTE: This can be empty if the testsuite is in metadata-providing mode
         const kurtosisApiSocketStr: string = process.env[KurtosisTestsuiteDockerEnvVar.KurtosisApiSocket];
 
@@ -53,10 +42,9 @@ class TestSuiteExecutor {
             return err(new Error("The '" + KurtosisTestsuiteDockerEnvVar.CustomParamsJson + "' serialized custom params environment variable was defined, but is emptystring"));
         }
 
-        // TODO This should use Result<null>!
-        const logLevelErr: Error = this.configurator.setLogLevel(logLevelStr);
-        if (logLevelErr !== null) {
-            return err(logLevelErr);
+        const setLogLevelResult: Result<null, Error> = this.configurator.setLogLevel(logLevelStr);
+        if (!setLogLevelResult.isOk()) {
+            return err(setLogLevelResult.error);
         }
 
         const parseParamsAndCreateSuiteResult: Result<TestSuite, Error> = this.configurator.parseParamsAndCreateSuite(customSerializedParamsStr);
@@ -65,42 +53,50 @@ class TestSuiteExecutor {
         }
         const suite: TestSuite = parseParamsAndCreateSuiteResult.value;
 
-        let testsuiteService: ITestSuiteServiceService;
+        let testsuiteService: KnownKeysOnly<ITestSuiteServiceServer>;
+        let apiContainerClient: ApiContainerServiceClient = null;
+        let postShutdownHook: () => void;
+
         if (kurtosisApiSocketStr === "") {
             testsuiteService = new MetadataProvidingTestsuiteService(suite);
+            postShutdownHook = null;
         } else {
 
-            // TODO SECURITY: Use HTTPS to ensure we're connecting to the real Kurtosis API servers
-            // TODO need to wrap this in exception-handling
-            const conn: grpc.Client = new grpc.Client(kurtosisApiSocketStr, grpc.credentials.createInsecure());
-
-            // TODO Your try-finally needs to be a lot bigger than this - as-is, this connection will get closed almost immediately (long before the server starts)
+            // TODO SECURITY: Use HTTPS to ensure we're connecting to the real Kurtosis API servers             
             try {
-                const apiContainerClient: newApiContainerServiceClient = newApiContainerServiceClient(conn);
-                const networkCtx: NetworkContext = NetworkContext(apiContainerClient, ENCLAVE_DATA_VOLUME_MOUNTPOINT);
-                testsuiteService = new TestExecutingTestsuiteService(suite, networkCtx);
-            } finally {
-                conn.Close()
+                apiContainerClient = new ApiContainerServiceClient(kurtosisApiSocketStr, grpc.credentials.createInsecure());
+            } catch(clientErr) {
+                return err(clientErr);
             }
+
+            postShutdownHook = () => apiContainerClient.close();
+            const networkCtx: NetworkContext = new NetworkContext(apiContainerClient, ENCLAVE_DATA_VOLUME_MOUNTPOINT);
+            testsuiteService = new TestExecutingTestsuiteService(suite, networkCtx);
         }
 
-        const serviceRegistrationFuncs: { (server: grpc.Server): void; }[] = [
-            (server: grpc.Server) => {
-                server.addService(TestSuiteServiceService, testsuiteService);
+        try {
+            const serviceRegistrationFuncs: { (server: grpc.Server): void; }[] = [
+                (server: grpc.Server) => {
+                    server.addService(TestSuiteServiceService, testsuiteService);
+                }
+            ]
+            
+            const grpcServer: MinimalGRPCServer = new MinimalGRPCServer(
+                LISTEN_PORT, 
+                GRPC_SERVER_STOP_GRACE_PERIOD_SECONDS,
+                serviceRegistrationFuncs
+            );
+
+            const runServerResult = await grpcServer.run();
+            if (runServerResult.isErr()) {
+                return err(runServerResult.error);
             }
-        ]
-        
-        const grpcServer: MinimalGRPCServer = new MinimalGRPCServer(
-            LISTEN_PORT, 
-            GRPC_SERVER_STOP_GRACE_PERIOD_SECONDS,
-            serviceRegistrationFuncs
-        );
 
-        const runServerResult = await grpcServer.run();
-        if (runServerResult.isErr()) {
-            return err(runServerResult.error);
+            return ok(null);
+        } finally {
+            if (postShutdownHook) {
+                postShutdownHook();
+            }
         }
-
-        return ok(null);
     }
 }
