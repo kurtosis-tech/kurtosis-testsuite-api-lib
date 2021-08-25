@@ -117,7 +117,7 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
             return err(new Error("Testsuite was directed to setup test '" + testName + "', but no test with that name exists " +
             "in the testsuite; this is a Kurtosis code bug"));
         }
-        const test: Test = allTests[testName];
+        const test: Test = allTests.get(testName)!;
 
         log.info("Setting up network for test '" + testName + "'...");
         
@@ -136,7 +136,7 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
         this.postSetupNetwork = userNetworkResult.value;
         log.info("Successfully set up test network for test '" + testName + "'");
 
-        ok(null);
+        return ok(null);
     }
 
     public async runTestAsync(args: RunTestArgs): Promise<Result<null, Error>> {
@@ -152,7 +152,7 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
             return err(new Error("Testsuite was directed to run test '" + testName + "', but no test with that name exists " +
             "in the testsuite; this is a Kurtosis code bug"));
         }
-        const test: Test = allTests[testName];
+        const test: Test = allTests.get(testName)!;
 
         log.info("Running test logic for test '" + testName + "'...");
 

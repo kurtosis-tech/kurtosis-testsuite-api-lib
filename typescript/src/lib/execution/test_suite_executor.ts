@@ -24,21 +24,30 @@ export class TestSuiteExecutor {
 
     public async run(): Promise<Result<null, Error>> {
         // NOTE: This can be empty if the testsuite is in metadata-providing mode
-        const kurtosisApiSocketStr: string = process.env[KurtosisTestsuiteDockerEnvVar.KurtosisApiSocket];
+        const kurtosisApiSocketStr: string | undefined = process.env[KurtosisTestsuiteDockerEnvVar.KurtosisApiSocket];
+        if (kurtosisApiSocketStr === undefined) {
+            return err(new Error("The '" + KurtosisTestsuiteDockerEnvVar.KurtosisApiSocket + "' string environment variable was undefined"));
+        }
 
         if (!(KurtosisTestsuiteDockerEnvVar.LogLevel in process.env)) {
             return err(new Error("Expected an '" + KurtosisTestsuiteDockerEnvVar.LogLevel + "' environment variable containing the log level string that the testsuite should log at, but none was found"));
         }
-        const logLevelStr: string = process.env[KurtosisTestsuiteDockerEnvVar.LogLevel];
-        if (logLevelStr == "") {
+        const logLevelStr: string | undefined = process.env[KurtosisTestsuiteDockerEnvVar.LogLevel];
+        if (logLevelStr === undefined) {
+            return err(new Error("The '" + KurtosisTestsuiteDockerEnvVar.LogLevel + "' loglevel environment variable was undefined"));
+        }
+        if (logLevelStr === "") {
             return err(new Error("The '" + KurtosisTestsuiteDockerEnvVar.LogLevel + "' loglevel environment variable was defined, but is emptystring"));
         }
 
         if (!(KurtosisTestsuiteDockerEnvVar.CustomParamsJson in process.env)) {
             return err(new Error("Expected an '" + KurtosisTestsuiteDockerEnvVar.CustomParamsJson + "' environment variable containing the serialized custom params that the testsuite will consume, but none was found"));
         }
-        const customSerializedParamsStr: string = process.env[KurtosisTestsuiteDockerEnvVar.CustomParamsJson];
-        if (customSerializedParamsStr == "") {
+        const customSerializedParamsStr: string | undefined = process.env[KurtosisTestsuiteDockerEnvVar.CustomParamsJson];
+        if (customSerializedParamsStr === undefined) {
+            return err(new Error("The '" + KurtosisTestsuiteDockerEnvVar.CustomParamsJson + "' serialized custom params environment variable was undefined"));
+        }
+        if (customSerializedParamsStr === "") {
             return err(new Error("The '" + KurtosisTestsuiteDockerEnvVar.CustomParamsJson + "' serialized custom params environment variable was defined, but is emptystring"));
         }
 
@@ -54,12 +63,11 @@ export class TestSuiteExecutor {
         const suite: TestSuite = parseParamsAndCreateSuiteResult.value;
 
         let testsuiteService: KnownKeysOnly<ITestSuiteServiceServer>;
-        let apiContainerClient: ApiContainerServiceClient = null;
-        let postShutdownHook: () => void;
+        let apiContainerClient: ApiContainerServiceClient;
+        let postShutdownHook: null | (() => void) = null;
 
         if (kurtosisApiSocketStr === "") {
             testsuiteService = new MetadataProvidingTestsuiteService(suite);
-            postShutdownHook = null;
         } else {
 
             // TODO SECURITY: Use HTTPS to ensure we're connecting to the real Kurtosis API servers             

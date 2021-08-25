@@ -32,7 +32,7 @@ export class MetadataProvidingTestsuiteService implements KnownKeysOnly<ITestSui
                 testConfig.getSetupTimeoutSeconds(), 
                 testConfig.getRunTimeoutSeconds());
     
-            allTestMetadata[testName] = testMetadata;
+            allTestMetadata.set(testName, testMetadata);
         }
 
         const testSuiteMetadata: TestSuiteMetadata = new TestSuiteMetadata();
