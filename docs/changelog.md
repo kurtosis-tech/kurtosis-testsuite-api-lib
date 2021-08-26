@@ -1,4 +1,6 @@
 # TBD
+### Fixes
+* Don't check docs on develop/master
 
 # 0.4.2
 

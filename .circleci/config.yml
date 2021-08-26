@@ -72,6 +72,11 @@ workflows:
                     }
                 ]
             }
+          filters:
+            branches:
+              ignore:
+                - develop
+                - master
       - check_golang:
           filters:
             branches:
