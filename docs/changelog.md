@@ -1,5 +1,9 @@
 # TBD
 
+### Changes
+* Installed latest version of minimal-grpc-server npm package which fix important bugs
+* Installed kurtosis-core-api-lib npm package which adds new exports that users can access
+
 # 0.4.1
 ### Changes
 * Use the devtools version of package-updating
