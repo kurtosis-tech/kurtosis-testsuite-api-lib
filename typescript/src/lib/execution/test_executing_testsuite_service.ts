@@ -33,7 +33,7 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
     }
 
     public isAvailable(call: grpc.ServerUnaryCall<google_protobuf_empty_pb.Empty>, callback: grpc.sendUnaryData<google_protobuf_empty_pb.Empty>): void {
-        callback(null, null);
+        callback(null, new google_protobuf_empty_pb.Empty());
     }
 
     public getTestSuiteMetadata(call: grpc.ServerUnaryCall<google_protobuf_empty_pb.Empty>, callback: grpc.sendUnaryData<TestSuiteMetadata>): void {
@@ -65,7 +65,7 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
                     return;
                 }
 
-                callback(null, null);
+                callback(null, new google_protobuf_empty_pb.Empty());
 
             })
         })
@@ -82,7 +82,7 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
             if (!setupTestResult.isOk()) {
                 callback(setupTestResult.error, null);
             } else {
-                callback(null, null);
+                callback(null, new google_protobuf_empty_pb.Empty());
             }
 
         })
@@ -97,7 +97,7 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
             if (!runTestResult.isOk()) {
                 callback(runTestResult.error, null);
             } else {
-                callback(null, null);
+                callback(null, new google_protobuf_empty_pb.Empty());
             }
         })
     }
