@@ -2,6 +2,9 @@
 ### Fixes
 * Don't check docs on develop/master
 
+### Changes
+* Updated the implemented methods for KnownKeysOnly<ITestSuiteServiceServer> to callback google_protobuf_empty_pb.Empty when needed
+
 # 0.4.2
 
 ### Changes
