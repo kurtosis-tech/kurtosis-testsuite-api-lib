@@ -1,7 +1,7 @@
 # TBD
 
 ### Changes
-* Installed latest version of minimal-grpc-server npm package which fix important bugs
+* Installed latest version of minimal-grpc-server npm package which fix important bugs to run docker with kurtosis
 * Installed kurtosis-core-api-lib npm package which adds new exports that users can access
 
 # 0.4.1
