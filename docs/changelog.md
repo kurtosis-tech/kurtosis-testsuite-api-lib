@@ -1,5 +1,8 @@
 # TBD
 
+### Changes
+* Updated kurtosis-core-api-lib which fixed important semantical issues
+
 # 0.4.3
 
 ### Changes
