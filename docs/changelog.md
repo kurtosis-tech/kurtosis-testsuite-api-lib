@@ -1,5 +1,10 @@
 # TBD
 
+# 0.4.6
+
+### Changes
+* Updated kurtosis-core-api-lib which cleaned-up some of the code from kurtosis-client
+
 # 0.4.5
 
 ### Changes
