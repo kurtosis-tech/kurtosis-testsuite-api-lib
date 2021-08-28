@@ -121,7 +121,19 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
 
         log.info("Setting up network for test '" + testName + "'...");
         
-        const userNetworkResult: Result<Network, Error> = await test.setup(this.networkCtx);
+        let userNetworkResult: Result<Network, Error>;
+        try {
+            userNetworkResult = await test.setup(this.networkCtx);
+        } catch (exception: any) {
+            // Sadly, we have to do this because there's no great way to enforce the caught thing being an error
+            // See: https://stackoverflow.com/questions/30469261/checking-for-typeof-error-in-js
+            if (exception && exception.stack && exception.message) {
+                return err(exception as Error);
+            }
+            return err(new Error("Performing test setup with NetworkContext parameter threw an exception, but " +
+                "it's not an Error so we can't report any more information than this"));
+        }
+
         if (!userNetworkResult.isOk()) {
             return err(userNetworkResult.error);
         } 
@@ -159,8 +171,14 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
         let runTestResult: Result<null, Error>;
         try {
             runTestResult = await test.run(this.postSetupNetwork);
-        } catch(exception) {
-            return err(exception);
+        } catch (exception: any) {
+            // Sadly, we have to do this because there's no great way to enforce the caught thing being an error
+            // See: https://stackoverflow.com/questions/30469261/checking-for-typeof-error-in-js
+            if (exception && exception.stack && exception.message) {
+                return err(exception as Error);
+            }
+            return err(new Error("Performing test run threw an exception, but " +
+                "it's not an Error so we can't report any more information than this"));
         }
 
         if (!runTestResult.isOk()) {

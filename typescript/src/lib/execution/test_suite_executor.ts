@@ -67,8 +67,14 @@ export class TestSuiteExecutor {
             // TODO SECURITY: Use HTTPS to ensure we're connecting to the real Kurtosis API servers             
             try {
                 apiContainerClient = new ApiContainerServiceClient(kurtosisApiSocketStr, grpc.credentials.createInsecure());
-            } catch(clientErr) {
-                return err(clientErr);
+            } catch(exception: any) {
+                // Sadly, we have to do this because there's no great way to enforce the caught thing being an error
+                // See: https://stackoverflow.com/questions/30469261/checking-for-typeof-error-in-js
+                if (exception && exception.stack && exception.message) {
+                    return err(exception as Error);
+                }
+                return err(new Error("Creating a APIContianer client threw an exception, but " +
+                    "it's not an Error so we can't report any more information than this"));
             }
 
             postShutdownHook = () => apiContainerClient.close();
@@ -89,7 +95,19 @@ export class TestSuiteExecutor {
                 serviceRegistrationFuncs
             );
 
-            const runServerResult = await grpcServer.run();
+            let runServerResult: Result<null, Error>;
+            try {
+                runServerResult = await grpcServer.run();
+            } catch (exception: any) {
+                // Sadly, we have to do this because there's no great way to enforce the caught thing being an error
+                // See: https://stackoverflow.com/questions/30469261/checking-for-typeof-error-in-js
+                if (exception && exception.stack && exception.message) {
+                    return err(exception as Error);
+                }
+                return err(new Error("Running the grpc server threw an exception, but " +
+                    "it's not an Error so we can't report any more information than this"));
+            }
+
             if (runServerResult.isErr()) {
                 return err(runServerResult.error);
             }

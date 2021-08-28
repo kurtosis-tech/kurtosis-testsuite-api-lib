@@ -1,5 +1,8 @@
 # TBD
 
+### Fixes
+* Adding catch clauses after trying an await command to account for exceptions and ensuring to type them appropriately
+
 # 0.4.4
 
 ### Changes
