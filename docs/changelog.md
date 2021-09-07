@@ -1,22 +1,20 @@
 # TBD
+### Fixes
+* Recover panic when a test's setup is executed
 
 # 0.4.6
-
 ### Changes
 * Updated kurtosis-core-api-lib which cleaned-up some of the code from kurtosis-client
 
 # 0.4.5
-
 ### Changes
 * Updated kurtosis-core-api-lib which fixed important semantical issues
 
 # 0.4.4
-
 ### Changes
 * Updated kurtosis-core-api-lib which fixed important semantical issues
 
 # 0.4.3
-
 ### Changes
 * Updated kurtosis-core-api-lib which fixed important semantical issues
 * Updated the implemented methods for KnownKeysOnly<ITestSuiteServiceServer> to callback google_protobuf_empty_pb.Empty when needed
@@ -25,7 +23,6 @@
 * Don't check docs on develop/master
 
 # 0.4.2
-
 ### Changes
 * Installed latest version of minimal-grpc-server npm package which fix important bugs to run docker with kurtosis
 * Installed kurtosis-core-api-lib npm package which adds new exports that users can access
