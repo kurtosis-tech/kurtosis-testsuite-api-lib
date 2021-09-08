@@ -1,4 +1,6 @@
 # TBD
+
+# 0.4.7
 ### Fixes
 * Recover from any panics thrown when a test's setup is executed
 
