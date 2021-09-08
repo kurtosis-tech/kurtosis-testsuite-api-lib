@@ -103,13 +103,15 @@ func (service *TestExecutingTestsuiteService) SetupTest(ctx context.Context, arg
 	}
 
 	logrus.Infof("Setting up network for test '%v'...", testName)
-	userNetwork, err := test.Setup(service.networkCtx)
+	userNetwork, err := setupTest(test, service.networkCtx)
 	if err != nil {
-		return nil, stacktrace.Propagate(err, "An error occurred during test setup")
+		return nil, stacktrace.Propagate(
+			err,
+			"An error occurred setting up test '%v'",
+			testName,
+		)
 	}
-	if userNetwork == nil {
-		return nil, stacktrace.NewError("The test setup method returned successfully, but yielded a nil network object - this is a bug with the test's setup method accidentally returning a nil network object")
-	}
+
 	service.postSetupNetwork = userNetwork
 	logrus.Infof("Successfully set up test network for test '%v'", testName)
 
@@ -148,6 +150,28 @@ func (service TestExecutingTestsuiteService) RunTest(ctx context.Context, args *
 	return &emptypb.Empty{}, nil
 }
 
+// ====================================================================================================
+//                                       Private helper functions
+// ====================================================================================================
+// Little helper function that setup the test and captures panics on test failures, returning them as errors
+func setupTest(test testsuite.Test, networkCtx *networks.NetworkContext) (network networks.Network, resultErr error) {
+	defer func() {
+		if recoverResult := recover(); recoverResult != nil {
+			logrus.Tracef("Caught panic while setting up test: %v", recoverResult)
+			resultErr = recoverResult.(error)
+		}
+	}()
+	userNetwork, err := test.Setup(networkCtx)
+	if err != nil {
+		return nil, stacktrace.Propagate(err, "Setting up the test returned an error")
+	}
+	if userNetwork == nil {
+		return nil, stacktrace.NewError("The test setup method returned successfully, but yielded a nil network object - this is a bug with the test's setup method accidentally returning a nil network object")
+	}
+	logrus.Tracef("Test setup successfully")
+	return userNetwork, nil
+}
+
 // Little helper function that runs the test and captures panics on test failures, returning them as errors
 func runTest(test testsuite.Test, untypedNetwork interface{}) (resultErr error) {
 	// See https://medium.com/@hussachai/error-handling-in-go-a-quick-opinionated-guide-9199dd7c7f76 for details
@@ -158,7 +182,7 @@ func runTest(test testsuite.Test, untypedNetwork interface{}) (resultErr error) 
 		}
 	}()
 	if err := test.Run(untypedNetwork); err != nil {
-		return stacktrace.Propagate(err, "The test returned an error")
+		return stacktrace.Propagate(err, "Running the test returned an error")
 	}
 	logrus.Tracef("Test completed successfully")
 	return
