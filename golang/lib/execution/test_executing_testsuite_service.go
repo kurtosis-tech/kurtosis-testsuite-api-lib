@@ -163,7 +163,7 @@ func setupTest(test testsuite.Test, networkCtx *networks.NetworkContext) (networ
 	}()
 	userNetwork, err := test.Setup(networkCtx)
 	if err != nil {
-		return nil, stacktrace.Propagate(err, "The test returned an error")
+		return nil, stacktrace.Propagate(err, "Setting up the test returned an error")
 	}
 	if userNetwork == nil {
 		return nil, stacktrace.NewError("The test setup method returned successfully, but yielded a nil network object - this is a bug with the test's setup method accidentally returning a nil network object")
@@ -182,7 +182,7 @@ func runTest(test testsuite.Test, untypedNetwork interface{}) (resultErr error) 
 		}
 	}()
 	if err := test.Run(untypedNetwork); err != nil {
-		return stacktrace.Propagate(err, "The test returned an error")
+		return stacktrace.Propagate(err, "Running the test returned an error")
 	}
 	logrus.Tracef("Test completed successfully")
 	return

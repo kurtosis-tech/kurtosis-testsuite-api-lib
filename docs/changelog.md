@@ -1,6 +1,6 @@
 # TBD
 ### Fixes
-* Recover panic when a test's setup is executed
+* Recover from any panics thrown when a test's setup is executed
 
 # 0.4.6
 ### Changes
