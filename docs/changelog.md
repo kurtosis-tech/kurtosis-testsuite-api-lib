@@ -1,4 +1,6 @@
 # TBD
+
+# 0.6.0
 ### Fixes
 * Correct accidental non-upgrade of Kurt Client to 0.15.0 in the Golang version
 
