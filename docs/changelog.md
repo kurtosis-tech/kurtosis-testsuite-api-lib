@@ -1,17 +1,19 @@
 # TBD
+### Fixes
+* Upgraded to Kurt Client 0.15.0 to fix a typo in ContainerRunConfigBuilder
+
+### Breaking Changes
+* Upgrade to Kurt Client 0.15.0 (see break remediation [here](https://github.com/kurtosis-tech/kurtosis-client/blob/develop/docs/changelog.md))
 
 # 0.4.5
-
 ### Changes
 * Updated kurtosis-core-api-lib which fixed important semantical issues
 
 # 0.4.4
-
 ### Changes
 * Updated kurtosis-core-api-lib which fixed important semantical issues
 
 # 0.4.3
-
 ### Changes
 * Updated kurtosis-core-api-lib which fixed important semantical issues
 * Updated the implemented methods for KnownKeysOnly<ITestSuiteServiceServer> to callback google_protobuf_empty_pb.Empty when needed
@@ -20,7 +22,6 @@
 * Don't check docs on develop/master
 
 # 0.4.2
-
 ### Changes
 * Installed latest version of minimal-grpc-server npm package which fix important bugs to run docker with kurtosis
 * Installed kurtosis-core-api-lib npm package which adds new exports that users can access
