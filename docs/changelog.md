@@ -1,5 +1,12 @@
 # TBD
 
+# 0.6.0
+### Fixes
+* Correct accidental non-upgrade of Kurt Client to 0.15.0 in the Golang version
+
+### Breaking Changes
+* Actually upgrade Golang version to Kurt Client 0.15.0 (see break remediation [here](https://github.com/kurtosis-tech/kurtosis-client/blob/develop/docs/changelog.md))
+
 # 0.5.0
 ### Fixes
 * Upgraded to Kurt Client 0.15.0 to fix a typo in ContainerRunConfigBuilder
