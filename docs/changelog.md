@@ -1,5 +1,12 @@
 # TBD
 
+# 0.5.0
+### Fixes
+* Upgraded to Kurt Client 0.15.0 to fix a typo in ContainerRunConfigBuilder
+
+### Breaking Changes
+* Upgrade to Kurt Client 0.15.0 (see break remediation [here](https://github.com/kurtosis-tech/kurtosis-client/blob/develop/docs/changelog.md))
+
 # 0.4.7
 ### Fixes
 * Recover from any panics thrown when a test's setup is executed
