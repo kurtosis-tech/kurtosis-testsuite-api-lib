@@ -5,6 +5,14 @@
 ### Breaking Changes
 * Upgrade to Kurt Client 0.15.0 (see break remediation [here](https://github.com/kurtosis-tech/kurtosis-client/blob/develop/docs/changelog.md))
 
+# 0.4.7
+### Fixes
+* Recover from any panics thrown when a test's setup is executed
+
+# 0.4.6
+### Changes
+* Updated kurtosis-core-api-lib which cleaned-up some of the code from kurtosis-client
+
 # 0.4.5
 ### Changes
 * Updated kurtosis-core-api-lib which fixed important semantical issues
