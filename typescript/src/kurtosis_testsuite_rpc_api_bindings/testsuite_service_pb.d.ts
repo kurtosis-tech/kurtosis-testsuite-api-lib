@@ -51,21 +51,21 @@ export namespace TestMetadata {
   }
 }
 
-export class RegisterFilesArgs extends jspb.Message {
+export class RegisterFilesArtifactsArgs extends jspb.Message {
   getTestName(): string;
   setTestName(value: string): void;
 
   serializeBinary(): Uint8Array;
-  toObject(includeInstance?: boolean): RegisterFilesArgs.AsObject;
-  static toObject(includeInstance: boolean, msg: RegisterFilesArgs): RegisterFilesArgs.AsObject;
+  toObject(includeInstance?: boolean): RegisterFilesArtifactsArgs.AsObject;
+  static toObject(includeInstance: boolean, msg: RegisterFilesArtifactsArgs): RegisterFilesArtifactsArgs.AsObject;
   static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
   static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
-  static serializeBinaryToWriter(message: RegisterFilesArgs, writer: jspb.BinaryWriter): void;
-  static deserializeBinary(bytes: Uint8Array): RegisterFilesArgs;
-  static deserializeBinaryFromReader(message: RegisterFilesArgs, reader: jspb.BinaryReader): RegisterFilesArgs;
+  static serializeBinaryToWriter(message: RegisterFilesArtifactsArgs, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): RegisterFilesArtifactsArgs;
+  static deserializeBinaryFromReader(message: RegisterFilesArtifactsArgs, reader: jspb.BinaryReader): RegisterFilesArtifactsArgs;
 }
 
-export namespace RegisterFilesArgs {
+export namespace RegisterFilesArtifactsArgs {
   export type AsObject = {
     testName: string,
   }

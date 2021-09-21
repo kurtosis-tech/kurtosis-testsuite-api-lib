@@ -44,14 +44,10 @@ github.com/google/go-cmp v0.5.5/go.mod h1:v8dTdLbMG2kIc/vJvl+f65V22dbkXbowE6jgT/
 github.com/google/uuid v1.1.2/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
 github.com/grpc-ecosystem/grpc-gateway v1.16.0/go.mod h1:BDjrQk3hbvj6Nolgz8mAMFbcEtjT1g+wF4CSlocrBnw=
 github.com/konsorten/go-windows-terminal-sequences v1.0.1/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=
-github.com/kurtosis-tech/kurtosis-client v0.0.0-20210909190949-0269aee6ca8e h1:3lLTAxONRfrsWDzm91psyPDEbIP7lQz21lbcmmPC4ww=
-github.com/kurtosis-tech/kurtosis-client v0.0.0-20210909190949-0269aee6ca8e/go.mod h1:PvyxxN73puf58EtJu7UF668Xw0BPzlX6Wh6Zb6/8l0I=
-github.com/kurtosis-tech/kurtosis-client/golang v0.0.0-20210803193237-d8bcc867ae0e h1:F5wsNyPTH+mk8R36xbl2zoz4vBLybChrTCFq10AP6nw=
-github.com/kurtosis-tech/kurtosis-client/golang v0.0.0-20210803193237-d8bcc867ae0e/go.mod h1:UQD+w+gp8PItWKvIKJGO2PExpmO6p0XhWfBOtGPzBLM=
-github.com/kurtosis-tech/kurtosis-client/golang v0.0.0-20210909190949-0269aee6ca8e h1:dZdDT/g5+LJrG4vheeb3eVInBINnF+a7PbJhRKxvYTM=
-github.com/kurtosis-tech/kurtosis-client/golang v0.0.0-20210909190949-0269aee6ca8e/go.mod h1:UQD+w+gp8PItWKvIKJGO2PExpmO6p0XhWfBOtGPzBLM=
 github.com/kurtosis-tech/kurtosis-client/golang v0.0.0-20210921005707-7242df8ee323 h1:8ZotfOQwXHhsyB9iFy7afys+Eog8qoaQC6Ct99qZPwg=
 github.com/kurtosis-tech/kurtosis-client/golang v0.0.0-20210921005707-7242df8ee323/go.mod h1:UQD+w+gp8PItWKvIKJGO2PExpmO6p0XhWfBOtGPzBLM=
+github.com/kurtosis-tech/kurtosis-client/golang v0.0.0-20210921190426-f5f3ecc4c127 h1:0qoO8Ckr+j7JAGnEjqwhTH9AlyqlhD4jU0tFIP7uLpE=
+github.com/kurtosis-tech/kurtosis-client/golang v0.0.0-20210921190426-f5f3ecc4c127/go.mod h1:UQD+w+gp8PItWKvIKJGO2PExpmO6p0XhWfBOtGPzBLM=
 github.com/kurtosis-tech/minimal-grpc-server/golang v0.0.0-20210821054858-4cac5a245c85 h1:Q8r0lOSVuo5Kl/gT5eN/AKKDvgETls/fFR7c1t9wagA=
 github.com/kurtosis-tech/minimal-grpc-server/golang v0.0.0-20210821054858-4cac5a245c85/go.mod h1:yHrYJlkpZAVsb2eH7KK2cZXabz03ZBKV/npGwsbN6vM=
 github.com/palantir/stacktrace v0.0.0-20161112013806-78658fd2d177 h1:nRlQD0u1871kaznCnn1EvYiMbum36v7hw1DLPEjds4o=

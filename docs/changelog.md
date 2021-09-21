@@ -1,4 +1,11 @@
 # TBD
+### Changes
+* Upgraded to Kurt Client 0.xxx.xxx which removes the `RegisterFiles` method from the API and adds two now objects `SharedDirectory` and `SharedFileObject`
+* Renamed `RegisterFiles` to `RegisterFilesArtifacts` in testsuite service API because now it doesn't register static files, it only registers the file artifacts
+
+### Breaking Changes
+* Removed `StaticFileFilepaths` from `TestConfiguration` object
+  * Users should manually create and copy static files into the service container with the help of the new `SharedDirectory` and `SharedFileObject` objects
 
 # 0.7.0
 ### Changes

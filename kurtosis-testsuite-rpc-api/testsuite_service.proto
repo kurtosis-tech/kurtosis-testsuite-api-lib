@@ -13,9 +13,9 @@ service TestSuiteService {
 
   rpc GetTestSuiteMetadata(google.protobuf.Empty) returns (TestSuiteMetadata) {};
 
-  // Will be called by the test initializer container, telling the testsuite container to register static files & files artifacts
+  // Will be called by the test initializer container, telling the testsuite container to register files artifacts
   //  so that they're available in the API container before the tests start running
-  rpc RegisterFiles(RegisterFilesArgs) returns (google.protobuf.Empty) {};
+  rpc RegisterFilesArtifacts(RegisterFilesArtifactsArgs) returns (google.protobuf.Empty) {};
 
   rpc SetupTest(SetupTestArgs) returns (google.protobuf.Empty) {};
 
@@ -39,9 +39,9 @@ message TestMetadata {
 }
 
 // ====================================================================================================
-//                                           Register Files
+//                                      Register Files Artifacts
 // ====================================================================================================
-message RegisterFilesArgs {
+message RegisterFilesArtifactsArgs {
   string test_name = 1;
 }
 

@@ -51,7 +51,7 @@ func (executor TestSuiteExecutor) Run() error {
 		return stacktrace.NewError("Expected an '%v' environment variable containing the log level string that the testsuite should log at, but none was found", kurtosis_testsuite_docker_api.LogLevelEnvVar)
 	}
 	if logLevelStr == "" {
-		return stacktrace.NewError("The '%v' loglevel environment variable was defined, but is emptystring", kurtosis_testsuite_docker_api.LogLevelEnvVar)
+		return stacktrace.NewError("The '%v' loglevel environment variable was defined, but is empty string", kurtosis_testsuite_docker_api.LogLevelEnvVar)
 	}
 
 	customSerializedParamsStr, found := os.LookupEnv(kurtosis_testsuite_docker_api.CustomParamsJsonEnvVar)
