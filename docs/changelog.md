@@ -1,4 +1,6 @@
 # TBD
+
+# 0.7.0
 ### Changes
 * Upgraded to `kurtosis-client` 0.16.0, which returns log output strings rather than bytes from `ServiceContext.execCommand`
 
