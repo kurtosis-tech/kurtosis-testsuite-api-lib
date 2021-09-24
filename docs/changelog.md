@@ -1,6 +1,6 @@
 # TBD
 ### Changes
-* Upgraded to Kurt Client 0.xxx.xxx which removes the `RegisterFiles` method from the API and adds two now objects `SharedDirectory` and `SharedFileObject`
+* Upgraded to [Kurt Client API 0.17.0](https://github.com/kurtosis-tech/kurtosis-client/blob/develop/docs/changelog.md#0170)
 * Renamed `RegisterFiles` to `RegisterFilesArtifacts` in testsuite service API because now it doesn't register static files, it only registers the file artifacts
 
 ### Breaking Changes
