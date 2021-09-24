@@ -91,7 +91,7 @@ func (executor TestSuiteExecutor) Run() error {
 			apiContainerClient,
 			kurtosis_testsuite_docker_api.EnclaveDataVolumeMountpoint,
 		)
-		testsuiteService = NewTestExecutingTestsuiteService(suite, networkCtx)
+		testsuiteService = NewTestExecutingTestsuiteService(suite.GetTests(), networkCtx)
 	}
 
 	testsuiteServiceRegistrationFunc := func(grpcServer *grpc.Server) {

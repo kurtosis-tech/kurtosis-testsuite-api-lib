@@ -1,5 +1,10 @@
 # TBD
 
+# 0.7.1
+### Fixes
+* Fixed bug where test state assigned in the `Test.setup` method wouldn't get persisted to the `Test.run` method
+* Fixed bug where Typescript `Test.setup` method wasn't wrapped with exception-catching
+
 # 0.7.0
 ### Changes
 * Upgraded to `kurtosis-client` 0.16.0, which returns log output strings rather than bytes from `ServiceContext.execCommand`

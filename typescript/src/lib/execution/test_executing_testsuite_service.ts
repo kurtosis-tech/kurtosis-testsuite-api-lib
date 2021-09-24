@@ -15,7 +15,7 @@ import { Result, ok, err } from "neverthrow";
 // Service for handling endpoints when the testsuite is in test-executing mode - i.e., inside a testsnet and running a single test
 export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteServiceServer>{
         
-    private readonly suite: TestSuite;
+    private readonly tests: Map<string, Test>;
     
     // Will be nil until setup is called
     private postSetupNetwork: Network | null;
@@ -25,8 +25,8 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
     
     private readonly networkCtx: NetworkContext;
     
-    constructor(suite: TestSuite, networkCtx: NetworkContext) {
-        this.suite = suite;
+    constructor(tests: Map<string, Test>, networkCtx: NetworkContext) {
+        this.tests = tests;
         this.postSetupNetwork = null;
         this.postSetupNetworkMutex = new mutex.Mutex();
         this.networkCtx = networkCtx;
@@ -43,11 +43,10 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
     public registerFiles(call: grpc.ServerUnaryCall<RegisterFilesArgs>, callback: grpc.sendUnaryData<google_protobuf_empty_pb.Empty>): void {
         const args: RegisterFilesArgs = call.request;
         const testName: string = args.getTestName();
-        const allTests: Map<string, Test> = this.suite.getTests();
-        if (!allTests.has(testName)) { //Note - making assumption that if key existing in Map, then value should be there too
+        if (!this.tests.has(testName)) { //Note - making assumption that if key existing in Map, then value should be there too
             callback(new Error("No test '" + testName + "' found in the testsuite"), null);
         }
-        const test: Test = allTests.get(testName)!;
+        const test: Test = this.tests.get(testName)!;
 
         const testConfigBuilder: TestConfigurationBuilder = new TestConfigurationBuilder();
         test.configure(testConfigBuilder);
@@ -112,28 +111,39 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
 
         const testName: string = args.getTestName();
 
-        const allTests: Map<string, Test> = this.suite.getTests();
-        if (!allTests.has(testName)) { //Note - making assumption that if key existing in Map, then value should be there too
+        if (!this.tests.has(testName)) { //Note - making assumption that if key existing in Map, then value should be there too
             return err(new Error("Testsuite was directed to setup test '" + testName + "', but no test with that name exists " +
             "in the testsuite; this is a Kurtosis code bug"));
         }
-        const test: Test = allTests.get(testName)!;
+        const test: Test = this.tests.get(testName)!;
 
         log.info("Setting up network for test '" + testName + "'...");
         
-        const userNetworkResult: Result<Network, Error> = await test.setup(this.networkCtx);
-        if (!userNetworkResult.isOk()) {
-            return err(userNetworkResult.error);
+        let setupTestResult: Result<Network, Error>;
+        try {
+            setupTestResult = await test.setup(this.networkCtx);
+        } catch(exception) {
+            if (exception instanceof Error) {
+                return err(exception);
+            }
+            return err(new Error("An unknown exception value was thrown during test setup that wasn't an error: " + exception));
+        }
+        if (!setupTestResult.isOk()) {
+            return err(setupTestResult.error);
         } 
-        if (userNetworkResult.value === undefined) {
-            return err(new Error("The test setup method returned successfully, but yielded an undefined network object - " +
-            "this is a bug with the test's setup method accidentally returning an undefined network object"));
+        if (setupTestResult.value === undefined) {
+            return err(new Error(
+                "The test setup method returned successfully, but yielded an undefined network object - " +
+                    "this is a bug with the test's setup method accidentally returning an undefined network object"
+            ));
         }
-        if (userNetworkResult.value === null) {
-            return err(new Error("The test setup method returned successfully, but yielded a null network object - " +
-            "this is a bug with the test's setup method accidentally returning a null network object"));
+        if (setupTestResult.value === null) {
+            return err(new Error(
+                "The test setup method returned successfully, but yielded a null network object - " +
+                    "this is a bug with the test's setup method accidentally returning a null network object"
+            ));
         }
-        this.postSetupNetwork = userNetworkResult.value;
+        this.postSetupNetwork = setupTestResult.value;
         log.info("Successfully set up test network for test '" + testName + "'");
 
         return ok(null);
@@ -147,12 +157,11 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
 
         const testName: string = args.getTestName();
 
-        const allTests: Map<string, Test> = this.suite.getTests();
-        if (!allTests.has(testName)) {
+        if (!this.tests.has(testName)) {
             return err(new Error("Testsuite was directed to run test '" + testName + "', but no test with that name exists " +
             "in the testsuite; this is a Kurtosis code bug"));
         }
-        const test: Test = allTests.get(testName)!;
+        const test: Test = this.tests.get(testName)!;
 
         log.info("Running test logic for test '" + testName + "'...");
 
@@ -160,7 +169,10 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
         try {
             runTestResult = await test.run(this.postSetupNetwork);
         } catch(exception) {
-            return err(exception);
+            if (exception instanceof Error) {
+                return err(exception);
+            }
+            return err(new Error("An unknown exception value was thrown during test run that wasn't an error: " + exception));
         }
 
         if (!runTestResult.isOk()) {
