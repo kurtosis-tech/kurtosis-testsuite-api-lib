@@ -1,4 +1,6 @@
 # TBD
+
+# 0.8.0
 ### Changes
 * Upgraded to [Kurt Client API 0.17.0](https://github.com/kurtosis-tech/kurtosis-client/blob/develop/docs/changelog.md#0170)
 * Renamed `RegisterFiles` to `RegisterFilesArtifacts` in testsuite service API because now it doesn't register static files, it only registers the file artifacts
