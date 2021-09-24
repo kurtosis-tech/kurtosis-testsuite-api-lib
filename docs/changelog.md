@@ -1,5 +1,9 @@
 # TBD
 
+# 0.8.1
+### Fixes
+* Upgraded Kurt client dependency to the latest version [Kurt Client API 0.17.0](https://github.com/kurtosis-tech/kurtosis-client/blob/develop/docs/changelog.md#0170)
+
 # 0.8.0
 ### Changes
 * Upgraded to [Kurt Client API 0.17.0](https://github.com/kurtosis-tech/kurtosis-client/blob/develop/docs/changelog.md#0170)
