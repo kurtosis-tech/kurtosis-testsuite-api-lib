@@ -61,7 +61,7 @@ func (service TestExecutingTestsuiteService) GetTestSuiteMetadata(ctx context.Co
 	return nil, stacktrace.NewError("Received a get suite metadata call while the testsuite service is in test-executing mode; this is a bug in Kurtosis")
 }
 
-func (service TestExecutingTestsuiteService) RegisterFiles(ctx context.Context, args *kurtosis_testsuite_rpc_api_bindings.RegisterFilesArgs) (*emptypb.Empty, error) {
+func (service TestExecutingTestsuiteService) RegisterFilesArtifacts(ctx context.Context, args *kurtosis_testsuite_rpc_api_bindings.RegisterFilesArtifactsArgs) (*emptypb.Empty, error) {
 	testName := args.TestName
 	test, found := service.tests[testName]
 	if !found {
@@ -72,9 +72,6 @@ func (service TestExecutingTestsuiteService) RegisterFiles(ctx context.Context, 
 	test.Configure(testConfigBuilder)
 	testConfig := testConfigBuilder.Build()
 
-	if err := service.networkCtx.RegisterStaticFiles(testConfig.StaticFileFilepaths); err != nil {
-		return nil, stacktrace.Propagate(err, "An error occurred registering the testsuite's static files")
-	}
 	if err := service.networkCtx.RegisterFilesArtifacts(testConfig.FilesArtifactUrls); err != nil {
 		return nil, stacktrace.Propagate(err, "An error occurred registering the testsuite's files artifact URLs")
 	}

@@ -3,7 +3,7 @@
  * All Rights Reserved.
  */
 
-import { StaticFileID, FilesArtifactID } from "kurtosis-core-api-lib";
+import { FilesArtifactID } from "kurtosis-core-api-lib";
 
 // Docs available at https://docs.kurtosistech.com/kurtosis-testsuite-api-lib/lib-documentation
 export class TestConfiguration {
@@ -17,21 +17,16 @@ export class TestConfiguration {
     private readonly isPartitioningEnabled: boolean;
 
     // Docs available at https://docs.kurtosistech.com/kurtosis-testsuite-api-lib/lib-documentation
-    private readonly staticFileFilepaths: Map<StaticFileID, string>;
-
-    // Docs available at https://docs.kurtosistech.com/kurtosis-testsuite-api-lib/lib-documentation
     private readonly filesArtifactUrls: Map<FilesArtifactID, string>;
 
     constructor(
             setupTimeoutSeconds: number, 
             runTimeoutSeconds: number, 
-            isPartitioningEnabled: boolean, 
-            staticFileFilepaths: Map<StaticFileID, string>,
+            isPartitioningEnabled: boolean,
             filesArtifactUrls: Map<FilesArtifactID, string>) {
         this.setupTimeoutSeconds = setupTimeoutSeconds;
         this.runTimeoutSeconds = runTimeoutSeconds;
         this.isPartitioningEnabled = isPartitioningEnabled;
-        this.staticFileFilepaths = staticFileFilepaths;
         this.filesArtifactUrls = filesArtifactUrls;
     }
 
@@ -47,11 +42,7 @@ export class TestConfiguration {
         return this.isPartitioningEnabled;
     }
 
-    public getStaticFileFilepaths(): Map<StaticFileID, string> {
-        return this.staticFileFilepaths;
-    }
-
-    public getFilesArtifactUrls(): Map<StaticFileID, string> {
+    public getFilesArtifactUrls(): Map<FilesArtifactID, string> {
         return this.filesArtifactUrls;
     }
 }

@@ -32,9 +32,6 @@ type TestConfiguration struct {
 	IsPartitioningEnabled bool
 
 	// Docs available at https://docs.kurtosistech.com/kurtosis-testsuite-api-lib/lib-documentation
-	StaticFileFilepaths map[services.StaticFileID]string
-
-	// Docs available at https://docs.kurtosistech.com/kurtosis-testsuite-api-lib/lib-documentation
 	FilesArtifactUrls map[services.FilesArtifactID]string
 }
 

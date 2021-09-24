@@ -61,8 +61,8 @@ func (service MetadataProvidingTestsuiteService) GetTestSuiteMetadata(ctx contex
 	return testSuiteMetadata, nil
 }
 
-func (service MetadataProvidingTestsuiteService) RegisterFiles(ctx context.Context, args *kurtosis_testsuite_rpc_api_bindings.RegisterFilesArgs) (*emptypb.Empty, error) {
-	return nil, stacktrace.NewError("Received a register files call while the testsuite service is in metadata-providing mode; this is a bug in Kurtosis")
+func (service MetadataProvidingTestsuiteService) RegisterFilesArtifacts(ctx context.Context, args *kurtosis_testsuite_rpc_api_bindings.RegisterFilesArtifactsArgs) (*emptypb.Empty, error) {
+	return nil, stacktrace.NewError("Received a register files artifacts call while the testsuite service is in metadata-providing mode; this is a bug in Kurtosis")
 }
 
 func (service MetadataProvidingTestsuiteService) SetupTest(ctx context.Context, args *kurtosis_testsuite_rpc_api_bindings.SetupTestArgs) (*emptypb.Empty, error) {
