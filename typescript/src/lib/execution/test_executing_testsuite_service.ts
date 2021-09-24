@@ -1,5 +1,5 @@
 import { ITestSuiteServiceServer } from "../../kurtosis_testsuite_rpc_api_bindings/testsuite_service_grpc_pb";
-import { RegisterFilesArgs, SetupTestArgs, RunTestArgs, TestSuiteMetadata } from "../../kurtosis_testsuite_rpc_api_bindings/testsuite_service_pb";
+import { RegisterFilesArtifactsArgs, SetupTestArgs, RunTestArgs, TestSuiteMetadata } from "../../kurtosis_testsuite_rpc_api_bindings/testsuite_service_pb";
 import { Test } from "../testsuite/test";
 import { TestSuite } from "../testsuite/test_suite";
 import { TestConfigurationBuilder } from "../testsuite/test_configuration_builder";
@@ -40,8 +40,8 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
         callback(new Error("Received a get suite metadata call while the testsuite service is in test-executing mode; " + "this is a bug in Kurtosis"), null);
     }
 
-    public registerFiles(call: grpc.ServerUnaryCall<RegisterFilesArgs>, callback: grpc.sendUnaryData<google_protobuf_empty_pb.Empty>): void {
-        const args: RegisterFilesArgs = call.request;
+    public registerFilesArtifacts(call: grpc.ServerUnaryCall<RegisterFilesArtifactsArgs>, callback: grpc.sendUnaryData<google_protobuf_empty_pb.Empty>): void {
+        const args: RegisterFilesArtifactsArgs = call.request;
         const testName: string = args.getTestName();
         if (!this.tests.has(testName)) { //Note - making assumption that if key existing in Map, then value should be there too
             callback(new Error("No test '" + testName + "' found in the testsuite"), null);
@@ -52,21 +52,13 @@ export class TestExecutingTestsuiteService implements KnownKeysOnly<ITestSuiteSe
         test.configure(testConfigBuilder);
         const testConfig: TestConfiguration = testConfigBuilder.build();
 
-        this.networkCtx.registerStaticFiles(testConfig.getStaticFileFilepaths()).then(registerStaticFilesResponse => {
-            if (!registerStaticFilesResponse.isOk()) {
-                callback(registerStaticFilesResponse.error, null);
+        this.networkCtx.registerFilesArtifacts(testConfig.getFilesArtifactUrls()).then(registerFilesArtifactsResponse => {
+            if (!registerFilesArtifactsResponse.isOk()) {
+                callback(registerFilesArtifactsResponse.error, null);
                 return;
             }
 
-            this.networkCtx.registerFilesArtifacts(testConfig.getFilesArtifactUrls()).then(registerFilesArtifactsResponse => {
-                if (!registerFilesArtifactsResponse.isOk()) {
-                    callback(registerFilesArtifactsResponse.error, null);
-                    return;
-                }
-
-                callback(null, new google_protobuf_empty_pb.Empty());
-
-            })
+            callback(null, new google_protobuf_empty_pb.Empty());
         })
 
     }

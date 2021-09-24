@@ -16,15 +16,15 @@ function deserialize_google_protobuf_Empty(buffer_arg) {
   return google_protobuf_empty_pb.Empty.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
-function serialize_test_suite_api_RegisterFilesArgs(arg) {
-  if (!(arg instanceof testsuite_service_pb.RegisterFilesArgs)) {
-    throw new Error('Expected argument of type test_suite_api.RegisterFilesArgs');
+function serialize_test_suite_api_RegisterFilesArtifactsArgs(arg) {
+  if (!(arg instanceof testsuite_service_pb.RegisterFilesArtifactsArgs)) {
+    throw new Error('Expected argument of type test_suite_api.RegisterFilesArtifactsArgs');
   }
   return Buffer.from(arg.serializeBinary());
 }
 
-function deserialize_test_suite_api_RegisterFilesArgs(buffer_arg) {
-  return testsuite_service_pb.RegisterFilesArgs.deserializeBinary(new Uint8Array(buffer_arg));
+function deserialize_test_suite_api_RegisterFilesArtifactsArgs(buffer_arg) {
+  return testsuite_service_pb.RegisterFilesArtifactsArgs.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
 function serialize_test_suite_api_RunTestArgs(arg) {
@@ -85,16 +85,16 @@ isAvailable: {
     responseSerialize: serialize_test_suite_api_TestSuiteMetadata,
     responseDeserialize: deserialize_test_suite_api_TestSuiteMetadata,
   },
-  // Will be called by the test initializer container, telling the testsuite container to register static files & files artifacts
+  // Will be called by the test initializer container, telling the testsuite container to register files artifacts
 //  so that they're available in the API container before the tests start running
-registerFiles: {
-    path: '/test_suite_api.TestSuiteService/RegisterFiles',
+registerFilesArtifacts: {
+    path: '/test_suite_api.TestSuiteService/RegisterFilesArtifacts',
     requestStream: false,
     responseStream: false,
-    requestType: testsuite_service_pb.RegisterFilesArgs,
+    requestType: testsuite_service_pb.RegisterFilesArtifactsArgs,
     responseType: google_protobuf_empty_pb.Empty,
-    requestSerialize: serialize_test_suite_api_RegisterFilesArgs,
-    requestDeserialize: deserialize_test_suite_api_RegisterFilesArgs,
+    requestSerialize: serialize_test_suite_api_RegisterFilesArtifactsArgs,
+    requestDeserialize: deserialize_test_suite_api_RegisterFilesArtifactsArgs,
     responseSerialize: serialize_google_protobuf_Empty,
     responseDeserialize: deserialize_google_protobuf_Empty,
   },

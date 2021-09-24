@@ -22,9 +22,9 @@ type TestSuiteServiceClient interface {
 	// Endpoint to verify the gRPC server is actually up before making any real calls
 	IsAvailable(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	GetTestSuiteMetadata(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*TestSuiteMetadata, error)
-	// Will be called by the test initializer container, telling the testsuite container to register static files & files artifacts
+	// Will be called by the test initializer container, telling the testsuite container to register files artifacts
 	//  so that they're available in the API container before the tests start running
-	RegisterFiles(ctx context.Context, in *RegisterFilesArgs, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	RegisterFilesArtifacts(ctx context.Context, in *RegisterFilesArtifactsArgs, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	SetupTest(ctx context.Context, in *SetupTestArgs, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	RunTest(ctx context.Context, in *RunTestArgs, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
@@ -55,9 +55,9 @@ func (c *testSuiteServiceClient) GetTestSuiteMetadata(ctx context.Context, in *e
 	return out, nil
 }
 
-func (c *testSuiteServiceClient) RegisterFiles(ctx context.Context, in *RegisterFilesArgs, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+func (c *testSuiteServiceClient) RegisterFilesArtifacts(ctx context.Context, in *RegisterFilesArtifactsArgs, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
-	err := c.cc.Invoke(ctx, "/test_suite_api.TestSuiteService/RegisterFiles", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/test_suite_api.TestSuiteService/RegisterFilesArtifacts", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -89,9 +89,9 @@ type TestSuiteServiceServer interface {
 	// Endpoint to verify the gRPC server is actually up before making any real calls
 	IsAvailable(context.Context, *emptypb.Empty) (*emptypb.Empty, error)
 	GetTestSuiteMetadata(context.Context, *emptypb.Empty) (*TestSuiteMetadata, error)
-	// Will be called by the test initializer container, telling the testsuite container to register static files & files artifacts
+	// Will be called by the test initializer container, telling the testsuite container to register files artifacts
 	//  so that they're available in the API container before the tests start running
-	RegisterFiles(context.Context, *RegisterFilesArgs) (*emptypb.Empty, error)
+	RegisterFilesArtifacts(context.Context, *RegisterFilesArtifactsArgs) (*emptypb.Empty, error)
 	SetupTest(context.Context, *SetupTestArgs) (*emptypb.Empty, error)
 	RunTest(context.Context, *RunTestArgs) (*emptypb.Empty, error)
 	mustEmbedUnimplementedTestSuiteServiceServer()
@@ -107,8 +107,8 @@ func (UnimplementedTestSuiteServiceServer) IsAvailable(context.Context, *emptypb
 func (UnimplementedTestSuiteServiceServer) GetTestSuiteMetadata(context.Context, *emptypb.Empty) (*TestSuiteMetadata, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTestSuiteMetadata not implemented")
 }
-func (UnimplementedTestSuiteServiceServer) RegisterFiles(context.Context, *RegisterFilesArgs) (*emptypb.Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RegisterFiles not implemented")
+func (UnimplementedTestSuiteServiceServer) RegisterFilesArtifacts(context.Context, *RegisterFilesArtifactsArgs) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RegisterFilesArtifacts not implemented")
 }
 func (UnimplementedTestSuiteServiceServer) SetupTest(context.Context, *SetupTestArgs) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetupTest not implemented")
@@ -165,20 +165,20 @@ func _TestSuiteService_GetTestSuiteMetadata_Handler(srv interface{}, ctx context
 	return interceptor(ctx, in, info, handler)
 }
 
-func _TestSuiteService_RegisterFiles_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RegisterFilesArgs)
+func _TestSuiteService_RegisterFilesArtifacts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(RegisterFilesArtifactsArgs)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TestSuiteServiceServer).RegisterFiles(ctx, in)
+		return srv.(TestSuiteServiceServer).RegisterFilesArtifacts(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/test_suite_api.TestSuiteService/RegisterFiles",
+		FullMethod: "/test_suite_api.TestSuiteService/RegisterFilesArtifacts",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TestSuiteServiceServer).RegisterFiles(ctx, req.(*RegisterFilesArgs))
+		return srv.(TestSuiteServiceServer).RegisterFilesArtifacts(ctx, req.(*RegisterFilesArtifactsArgs))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -235,8 +235,8 @@ var TestSuiteService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _TestSuiteService_GetTestSuiteMetadata_Handler,
 		},
 		{
-			MethodName: "RegisterFiles",
-			Handler:    _TestSuiteService_RegisterFiles_Handler,
+			MethodName: "RegisterFilesArtifacts",
+			Handler:    _TestSuiteService_RegisterFilesArtifacts_Handler,
 		},
 		{
 			MethodName: "SetupTest",

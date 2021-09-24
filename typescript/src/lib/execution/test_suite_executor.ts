@@ -33,7 +33,7 @@ export class TestSuiteExecutor {
         }
         const logLevelStr: string = maybeLogLevelStr!;
         if (logLevelStr === "") {
-            return err(new Error("The '" + KurtosisTestsuiteDockerEnvVar.LogLevel + "' loglevel environment variable was defined, but is emptystring"));
+            return err(new Error("The '" + KurtosisTestsuiteDockerEnvVar.LogLevel + "' loglevel environment variable was defined, but is empty string"));
         }
 
         const maybeCustomSerializedParamsStr: string | undefined = process.env[KurtosisTestsuiteDockerEnvVar.CustomParamsJson];

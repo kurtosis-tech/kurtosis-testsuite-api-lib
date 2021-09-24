@@ -1,5 +1,5 @@
 import { ITestSuiteServiceServer } from "../../kurtosis_testsuite_rpc_api_bindings/testsuite_service_grpc_pb";
-import { TestMetadata, TestSuiteMetadata, RegisterFilesArgs, SetupTestArgs, RunTestArgs } from "../../kurtosis_testsuite_rpc_api_bindings/testsuite_service_pb";
+import { TestMetadata, TestSuiteMetadata, RegisterFilesArtifactsArgs, SetupTestArgs, RunTestArgs } from "../../kurtosis_testsuite_rpc_api_bindings/testsuite_service_pb";
 import { TestConfigurationBuilder } from "../testsuite/test_configuration_builder";
 import { TestConfiguration } from "../testsuite/test_configuration";
 import { TestSuite } from "../testsuite/test_suite";
@@ -38,8 +38,8 @@ export class MetadataProvidingTestsuiteService implements KnownKeysOnly<ITestSui
         return callback(null, testSuiteMetadata);
     }
 
-    public registerFiles(call: grpc.ServerUnaryCall<RegisterFilesArgs>, callback: grpc.sendUnaryData<google_protobuf_empty_pb.Empty>): void {
-        callback(new Error("Received a register files call while the testsuite service is in metadata-providing mode; this is a bug in Kurtosis"), null);
+    public registerFilesArtifacts(call: grpc.ServerUnaryCall<RegisterFilesArtifactsArgs>, callback: grpc.sendUnaryData<google_protobuf_empty_pb.Empty>): void {
+        callback(new Error("Received a register files artifacts call while the testsuite service is in metadata-providing mode; this is a bug in Kurtosis"), null);
     }
 
     public setupTest(call: grpc.ServerUnaryCall<SetupTestArgs>, callback: grpc.sendUnaryData<google_protobuf_empty_pb.Empty>): void {
