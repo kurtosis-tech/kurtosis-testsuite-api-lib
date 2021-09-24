@@ -33,7 +33,7 @@ type TestExecutingTestsuiteService struct {
 	// This embedding is required by gRPC
 	kurtosis_testsuite_rpc_api_bindings.UnimplementedTestSuiteServiceServer
 
-	suite testsuite.TestSuite
+	tests map[string]testsuite.Test
 
 	// Will be nil until setup is called
 	postSetupNetwork networks.Network
@@ -44,9 +44,9 @@ type TestExecutingTestsuiteService struct {
 	networkCtx *networks.NetworkContext
 }
 
-func NewTestExecutingTestsuiteService(suite testsuite.TestSuite, networkCtx *networks.NetworkContext) *TestExecutingTestsuiteService {
+func NewTestExecutingTestsuiteService(tests map[string]testsuite.Test, networkCtx *networks.NetworkContext) *TestExecutingTestsuiteService {
 	return &TestExecutingTestsuiteService{
-		suite:              suite,
+		tests: tests,
 		postSetupNetwork:      nil,
 		postSetupNetworkMutex: &sync.Mutex{},
 		networkCtx: networkCtx,
@@ -63,8 +63,7 @@ func (service TestExecutingTestsuiteService) GetTestSuiteMetadata(ctx context.Co
 
 func (service TestExecutingTestsuiteService) RegisterFiles(ctx context.Context, args *kurtosis_testsuite_rpc_api_bindings.RegisterFilesArgs) (*emptypb.Empty, error) {
 	testName := args.TestName
-	allTests := service.suite.GetTests()
-	test, found := allTests[testName]
+	test, found := service.tests[testName]
 	if !found {
 		return nil, stacktrace.NewError("No test '%v' found in the testsuite", testName)
 	}
@@ -92,8 +91,7 @@ func (service *TestExecutingTestsuiteService) SetupTest(ctx context.Context, arg
 
 	testName := args.TestName
 
-	allTests := service.suite.GetTests()
-	test, found := allTests[testName]
+	test, found := service.tests[testName]
 	if !found {
 		return nil, stacktrace.NewError(
 			"Testsuite was directed to setup test '%v', but no test with that name exists " +
@@ -128,8 +126,7 @@ func (service TestExecutingTestsuiteService) RunTest(ctx context.Context, args *
 
 	testName := args.TestName
 
-	allTests := service.suite.GetTests()
-	test, found := allTests[testName]
+	test, found := service.tests[testName]
 	if !found {
 		return nil, stacktrace.NewError(
 			"Testsuite was directed to run test '%v', but no test with that name exists " +

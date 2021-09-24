@@ -67,13 +67,18 @@ export class TestSuiteExecutor {
             // TODO SECURITY: Use HTTPS to ensure we're connecting to the real Kurtosis API servers             
             try {
                 apiContainerClient = new ApiContainerServiceClient(kurtosisApiSocketStr, grpc.credentials.createInsecure());
-            } catch(clientErr) {
-                return err(clientErr);
+            } catch(exception) {
+                if (exception instanceof Error) {
+                    return err(exception);
+                }
+                return err(new Error(
+                    "An unknown exception value was thrown during creation of the API container client that wasn't an error: " + exception
+                ));
             }
 
             postShutdownHook = () => apiContainerClient.close();
             const networkCtx: NetworkContext = new NetworkContext(apiContainerClient, ENCLAVE_DATA_VOLUME_MOUNTPOINT);
-            testsuiteService = new TestExecutingTestsuiteService(suite, networkCtx);
+            testsuiteService = new TestExecutingTestsuiteService(suite.getTests(), networkCtx);
         }
 
         try {
