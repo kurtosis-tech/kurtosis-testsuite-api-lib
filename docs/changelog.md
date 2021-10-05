@@ -1,5 +1,13 @@
 # TBD
 
+# 0.9.0
+### Features
+* Upgraded Kurt client dependency to the latest version [Kurt Client API 0.17.3](https://github.com/kurtosis-tech/kurtosis-client/blob/develop/docs/changelog.md#0173)
+
+### Breaking Changes
+* Kurt Client's `GetChildPath` method only has one return value, rather than two
+    * Users should remove the error type
+
 # 0.8.1
 ### Fixes
 * Upgraded Kurt client dependency to the latest version [Kurt Client API 0.17.0](https://github.com/kurtosis-tech/kurtosis-client/blob/develop/docs/changelog.md#0170)
