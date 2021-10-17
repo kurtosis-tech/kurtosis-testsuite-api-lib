@@ -1,4 +1,6 @@
 # TBD
+
+# 0.11.0
 ### Changes
 * Use Kurt Client 0.19.0, which renames all instances of "Lambda" in the API to "module"
 
