@@ -1,5 +1,13 @@
 # TBD
 
+# 0.11.0
+### Changes
+* Use Kurt Client 0.19.0, which renames all instances of "Lambda" in the API to "module"
+
+### Breaking Changes
+* Uses [Kurt Client 0.19.0](https://github.com/kurtosis-tech/kurtosis-client/blob/develop/docs/changelog.md#0190), which renames all functions and classes that had "Lambda" in their name to "module"
+    * Users should use the changelog link to do the appropriate renaming
+
 # 0.10.0
 ### Fixes
 * Upgrade to [Kurtosis Client 0.18.0](https://github.com/kurtosis-tech/kurtosis-client/blob/develop/docs/changelog.md#0180), which fixes Typescript `SharedPath.GetChildPath` being accidentally uppercased
