@@ -4,7 +4,7 @@ import { TestExecutingTestsuiteService } from "./test_executing_testsuite_servic
 import { TestSuiteConfigurator } from "./test_suite_configurator";
 import { MetadataProvidingTestsuiteService } from "./metadata_providing_testsuite_service";
 import { TestSuite } from "../testsuite/test_suite";
-import { KurtosisTestsuiteDockerEnvVar, ENCLAVE_DATA_VOLUME_MOUNTPOINT } from "../../kurtosis_testsuite_docker_api/kurtosis_testsuite_docker_api";
+import { KurtosisTestsuiteDockerEnvVar, ENCLAVE_DATA_DIR_MOUNTPOINT } from "../../kurtosis_testsuite_docker_api/kurtosis_testsuite_docker_api";
 import { LISTEN_PORT } from "../../kurtosis_testsuite_rpc_api_consts/kurtosis_testsuite_rpc_api_consts";
 import { Result, err, ok } from "neverthrow";
 import * as grpc from "grpc";
@@ -77,7 +77,7 @@ export class TestSuiteExecutor {
             }
 
             postShutdownHook = () => apiContainerClient.close();
-            const networkCtx: NetworkContext = new NetworkContext(apiContainerClient, ENCLAVE_DATA_VOLUME_MOUNTPOINT);
+            const networkCtx: NetworkContext = new NetworkContext(apiContainerClient, ENCLAVE_DATA_DIR_MOUNTPOINT);
             testsuiteService = new TestExecutingTestsuiteService(suite.getTests(), networkCtx);
         }
 

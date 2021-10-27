@@ -1,5 +1,5 @@
 //Docker Api
-export { KurtosisTestsuiteDockerEnvVar, ENCLAVE_DATA_VOLUME_MOUNTPOINT } from "./kurtosis_testsuite_docker_api/kurtosis_testsuite_docker_api";
+export { KurtosisTestsuiteDockerEnvVar, ENCLAVE_DATA_DIR_MOUNTPOINT as ENCLAVE_DATA_VOLUME_MOUNTPOINT } from "./kurtosis_testsuite_docker_api/kurtosis_testsuite_docker_api";
 
 //RPC Api Consts
 export { LISTEN_PROTOCOL, LISTEN_PORT } from "./kurtosis_testsuite_rpc_api_consts/kurtosis_testsuite_rpc_api_consts";
