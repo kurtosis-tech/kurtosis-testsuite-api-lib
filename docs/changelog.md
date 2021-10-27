@@ -1,5 +1,13 @@
 # TBD
 
+# 0.12.0
+### Changes
+* The enclave data volume mountpoint constants have been renamed to reflect the new bind-mounting strategy
+
+### Breaking Changes
+* Renamed the `EnclaveDataVolumeMountpoint` constant to `EnclaveDataDirMountpoint` to reflect the new bind-mounting strategy
+    * Users should rename their Golang & Typescript constants appropriately
+
 # 0.11.0
 ### Changes
 * Use Kurt Client 0.19.0, which renames all instances of "Lambda" in the API to "module"

@@ -7,7 +7,7 @@ export enum KurtosisTestsuiteDockerEnvVar {
 }
 
 /*
-The dirpath on the testsuite container where the enclave data volume will be mounted
+The dirpath on the testsuite container where the enclave data directory will be bind-mounted
 This is hardcoded because there's no real reason for it to be parameterized.
 */
-export const ENCLAVE_DATA_VOLUME_MOUNTPOINT: string = "/kurtosis-enclave-data";
+export const ENCLAVE_DATA_DIR_MOUNTPOINT: string = "/kurtosis-enclave-data";
