@@ -1,4 +1,6 @@
 # TBD
+
+# 0.12.0
 ### Changes
 * The enclave data volume mountpoint constants have been renamed to reflect the new bind-mounting strategy
 
