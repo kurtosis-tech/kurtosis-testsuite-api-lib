@@ -1,6 +1,6 @@
 {
     "name": "kurtosis-testsuite-api-lib",
-    "version": "0.12.0",
+    "version": "0.12.1",
     "description": "This repo contains a Typescript library for writing a Kurtosis testsuite.",
     "main": "./build/index",
     "types": "./build/index",
