@@ -26,8 +26,8 @@ const (
 
 
 	/*
-	The dirpath on the testsuite container where the enclave data volume will be mounted
+	The dirpath on the testsuite container where the enclave data directory will be bind-mounted
 	This is hardcoded because there's no real reason for it to be parameterized.
 	*/
-	EnclaveDataVolumeMountpoint = "/kurtosis-enclave-data"
+	EnclaveDataDirMountpoint = "/kurtosis-enclave-data"
 )
