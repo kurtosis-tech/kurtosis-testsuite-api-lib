@@ -18,8 +18,8 @@
 package execution
 
 import (
-	"github.com/kurtosis-tech/kurtosis-client/golang/kurtosis_core_rpc_api_bindings"
-	"github.com/kurtosis-tech/kurtosis-client/golang/lib/networks"
+	"github.com/kurtosis-tech/kurtosis-engine-api-lib/golang/kurtosis_engine_rpc_api_bindings"
+	"github.com/kurtosis-tech/kurtosis-engine-api-lib/golang/lib/networks"
 	"github.com/kurtosis-tech/kurtosis-testsuite-api-lib/golang/kurtosis_testsuite_docker_api"
 	"github.com/kurtosis-tech/kurtosis-testsuite-api-lib/golang/kurtosis_testsuite_rpc_api_bindings"
 	"github.com/kurtosis-tech/kurtosis-testsuite-api-lib/golang/kurtosis_testsuite_rpc_api_consts"
@@ -43,8 +43,9 @@ func NewTestSuiteExecutor(configurator TestSuiteConfigurator) *TestSuiteExecutor
 }
 
 func (executor TestSuiteExecutor) Run() error {
-	// NOTE: This can be empty if the testsuite is in metadata-providing mode
-	kurtosisApiSocketStr := os.Getenv(kurtosis_testsuite_docker_api.KurtosisApiSocketEnvVar)
+	// NOTE: These can be empty if the testsuite is in metadata-providing mode
+	engineSocketStr := os.Getenv(kurtosis_testsuite_docker_api.EngineSocketEnvVar)
+	enclaveId := os.Getenv(kurtosis_testsuite_docker_api.EnclaveIDEnvVar)
 
 	logLevelStr, found := os.LookupEnv(kurtosis_testsuite_docker_api.LogLevelEnvVar)
 	if !found {
@@ -72,23 +73,24 @@ func (executor TestSuiteExecutor) Run() error {
 	}
 
 	var testsuiteService kurtosis_testsuite_rpc_api_bindings.TestSuiteServiceServer
-	if kurtosisApiSocketStr == "" {
+	if engineSocketStr == "" {
 		testsuiteService = NewMetadataProvidingTestsuiteService(suite)
 	} else {
 		// TODO SECURITY: Use HTTPS to ensure we're connecting to the real Kurtosis API servers
-		conn, err := grpc.Dial(kurtosisApiSocketStr, grpc.WithInsecure())
+		conn, err := grpc.Dial(engineSocketStr, grpc.WithInsecure())
 		if err != nil {
 			return stacktrace.Propagate(
 				err,
 				"An error occurred creating a connection to the Kurtosis API server at '%v'",
-				kurtosisApiSocketStr,
+				engineSocketStr,
 			)
 		}
 		defer conn.Close()
 
-		apiContainerClient := kurtosis_core_rpc_api_bindings.NewApiContainerServiceClient(conn)
+		apiContainerClient := kurtosis_engine_rpc_api_bindings.NewEngineServiceClient(conn)
 		networkCtx := networks.NewNetworkContext(
 			apiContainerClient,
+			enclaveId,
 			kurtosis_testsuite_docker_api.EnclaveDataDirMountpoint,
 		)
 		testsuiteService = NewTestExecutingTestsuiteService(suite.GetTests(), networkCtx)

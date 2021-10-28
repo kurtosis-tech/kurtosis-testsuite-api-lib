@@ -17,7 +17,7 @@
 
 package testsuite
 
-import "github.com/kurtosis-tech/kurtosis-client/golang/lib/services"
+import "github.com/kurtosis-tech/kurtosis-engine-api-lib/golang/lib/services"
 
 // TODO Make these fields private, with getters
 // Docs available at https://docs.kurtosistech.com/kurtosis-testsuite-api-lib/lib-documentation
